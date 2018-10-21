@@ -61,8 +61,8 @@
                     redirect_uri: 'http://localhost:8080',
 
                 };
-                var esc = encodeURIComponent;
-                var query = Object.keys(params)
+                const esc = encodeURIComponent;
+                const query = Object.keys(params)
                     .map(k => esc(k) + '=' + esc(params[k]))
                     .join('&');
 
@@ -90,9 +90,6 @@
                     // ...
                 });
 
-            },
-            loginWithSpotify: function () {
-                axios.get("https://accounts.spotify.com/authorize", {})
             },
             fetchPlaylists: function () {
                 let self = this;
