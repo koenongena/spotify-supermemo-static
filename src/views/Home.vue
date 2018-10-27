@@ -2,13 +2,16 @@
     <div class="home">
         <h1>Supermemo</h1>
 
-        <a href="#!" @click="login">Log in</a>
-
-        <p>
-            Token: <span>{{token}}</span>
+        <p v-if="!spotifyAccessToken">
+            Je bent momenteel niet geauthenticeerd bij Spotify.
+            <br/> Klik <a href="#!" @click="loginSpotify">hier</a> om in te loggen.
+        </p>
+        <p v-else>
+            Yippie, you are logged in.
+            Token: {{spotifyAccessToken}}
         </p>
 
-        <a :href="spotifyLoginURL" v-if="!spotifyAuthenticationToken">Spotify login</a>
+        <a :href="loginSpotify" v-if="!spotifyAccessToken">Spotify login</a>
         <a href="#!" @click="fetchPlaylists" v-else>Spotify playlists</a>
 
         <p>{{ error }}</p>
@@ -16,7 +19,7 @@
 </template>
 
 <script>
-    import firebase from 'firebase';
+    // import firebase from 'firebase';
     import axios from 'axios';
 
     export default {
@@ -25,76 +28,54 @@
             msg: String
         },
         mounted: function () {
-            if (!localStorage.getItem('spotifyAuthenticationToken')) {
-                let parseHash = function (s) {
-                    return s
-                        .substring(1)
-                        .split('&')
-                        .reduce(function (initial, item) {
-                            if (item) {
-                                const parts = item.split('=');
-                                initial[parts[0]] = decodeURIComponent(parts[1]);
-                            }
-                            return initial;
-                        }, {});
-                };
-
-                localStorage.setItem('spotifyAuthenticationToken', parseHash(this.$route.hash).access_token);
-            }
-
-            this.spotifyAuthenticationToken = localStorage.getItem('spotifyAuthenticationToken');
+            this.spotifyAccessToken = localStorage.getItem('sp-accessToken');
         },
         data: function () {
             return {
-                token: null,
                 user: null,
                 error: "",
                 playlists: [],
-                spotifyAuthenticationToken: null
+                spotifyAccessToken: null,
+                spotifyAccessTokenExpiresIn: null
             };
         },
-        computed: {
-            spotifyLoginURL: function () {
-                let params = {
-                    client_id: 'b04f52bb845a40909fad79d715ee2678',
-                    response_type: 'token',
-                    redirect_uri: 'http://localhost:8080',
-
-                };
-                const esc = encodeURIComponent;
-                const query = Object.keys(params)
-                    .map(k => esc(k) + '=' + esc(params[k]))
-                    .join('&');
-
-                return "https://accounts.spotify.com/authorize?" + query;
-            }
-        },
         methods: {
-            login: function () {
-                let provider = new firebase.auth.GoogleAuthProvider();
+            loginSpotify: function () {
+                var CLIENT_ID = 'b04f52bb845a40909fad79d715ee2678';
+                var REDIRECT_URI = 'http://localhost:8080/callback';
 
-                firebase.auth().signInWithPopup(provider).then(function (result) {
-                    // This gives you a Google Access Token. You can use it to access the Google API.
-                    this.token = result.credential.accessToken;
-                    // The signed-in user info.
-                    this.user = result.user;
+                function getLoginURL(scopes) {
+                    return 'https://accounts.spotify.com/authorize?client_id=' + CLIENT_ID +
+                        '&redirect_uri=' + encodeURIComponent(REDIRECT_URI) +
+                        '&scope=' + encodeURIComponent(scopes.join(' ')) +
+                        '&response_type=token';
+                }
 
-                }.bind(this)).catch(function () {
-                    // Handle Errors here.
-                    // var errorCode = error.code;
-                    // var errorMessage = error.message;
-                    // The email of the user's account used.
-                    // var email = error.email;
-                    // The firebase.auth.AuthCredential type that was used.
-                    // var credential = error.credential;
-                    // ...
-                });
+                const url = getLoginURL(['playlist-read-private']),
+                    width = 450,
+                    height = 730,
+                    left = (screen.width / 2) - (width / 2),
+                    top = (screen.height / 2) - (height / 2);
+
+
+                let spotifyLoginWindow = window.open(url,
+                    'Spotify',
+                    'menubar=no,location=no,resizable=no,scrollbars=no,status=no, width=' + width + ', height=' + height + ', top=' + top + ', left=' + left
+                );
+
+                var self = this;
+                spotifyLoginWindow.onbeforeunload = function () {
+                    self.spotifyAccessToken = localStorage.getItem('sp-accessToken');
+                    self.spotifyAccessTokenExpiresIn = localStorage.getItem('sp-accessTokenExpiresIn');
+                };
+
 
             },
+
             fetchPlaylists: function () {
                 let self = this;
                 let headers = {
-                    'Authorization': "Bearer " + self.spotifyAuthenticationToken
+                    'Authorization': "Bearer " + self.spotifyAccessToken
                 };
                 axios.get(" https://api.spotify.com/v1/me/playlists", {headers: headers})
                     .then(response => self.playlists = response.data)

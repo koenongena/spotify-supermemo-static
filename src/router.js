@@ -1,7 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home.vue'
-import Login from './views/Login';
+import Login from './views/Login.vue';
+import SpotifyCallback from './views/SpotifyCallback.vue';
 import firebase from 'firebase';
 
 Vue.use(Router);
@@ -22,6 +23,11 @@ let router = new Router({
             meta: {
                 requiresAuth: true
             }
+        },
+        {
+            path:'/callback',
+            name: 'callback',
+            component: SpotifyCallback,
         },
         {
             path: '/login',
