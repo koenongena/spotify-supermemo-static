@@ -5,6 +5,8 @@ class StudyScheduleService {
 
     constructor() {
         this._db = null;
+        this._log = window.console;
+
     }
 
     /**
@@ -15,23 +17,42 @@ class StudyScheduleService {
     create(date) {
         let startOfTheDay = moment(date).startOf('day');
         let playlistName = startOfTheDay.format("YYYY-MM-DD");
+        const self = this;
 
-        const Console = window.console;
-
+        let createStudymoment = function (date, additionalDays = 0) {
+            let timestamp = date.add(additionalDays, 'days');
+            let done = (timestamp.isBefore(moment()));
+            return {time: timestamp.toDate(), done: done}
+        };
         return this.db.collection("playlists")
             .doc(playlistName)
             .set({
                 name: playlistName,
                 studyMoments: [
-                    {time: date, done: true},
-                    {time: startOfTheDay.add(2, 'days').toDate(), done: false},
-                    {time: startOfTheDay.add(10, 'days').toDate(), done: false},
-                    {time: startOfTheDay.add(30, 'days').toDate(), done: false},
-                    {time: startOfTheDay.add(60, 'days').toDate(), done: false},
-                    {time: startOfTheDay.add(120, 'days').toDate(), done: false},
+                    createStudymoment(startOfTheDay),
+                    createStudymoment(startOfTheDay, 2),
+                    createStudymoment(startOfTheDay, 10),
+                    createStudymoment(startOfTheDay, 30),
+                    createStudymoment(startOfTheDay, 60),
+                    createStudymoment(startOfTheDay, 120),
                 ]
-            }).then(() => Console.log("Playlist " + playlistName + " added successfully"))
-            .catch((error) => Console.error(error))
+            }).then(() => self._log.log("Playlist " + playlistName + " added successfully"))
+            .catch((error) => self._log.error(error))
+
+    }
+
+    getPendingPlaylists() {
+        const notYetDone = it => moment(it.time.toDate()).isBefore(moment()) && !it.done;
+
+        return this.db.collection("playlists").get().then((p) => {
+            let pendingPlaylists = [];
+            p.forEach(doc => {
+                if (doc.data().studyMoments.some(notYetDone)){
+                    pendingPlaylists.push(doc.data());
+                }
+            });
+            return pendingPlaylists;
+        });
 
     }
 

@@ -7,14 +7,20 @@
             <br/> Klik <a href="#!" @click="loginSpotify">hier</a> om in te loggen.
         </p>
         <p v-else>
-            Yippie, you are logged in.
-            Token: {{spotifyAccessToken}}
+            Yippie, you are logged in with Spotify.
         </p>
+
+        <h1>Stuff to do today</h1>
+        <ul>
+            <li v-for="(pendingPlaylist, index) in pendingPlaylists" :key="index">{{pendingPlaylist.name}}</li>
+        </ul>
 
         <button @click.stop.prevent="addPlaylist">Add playlist for today</button>
 
-        <a :href="loginSpotify" v-if="!spotifyAccessToken">Spotify login</a>
-        <a href="#!" @click="fetchPlaylists" v-else>Spotify playlists</a>
+        <div>
+            <a :href="loginSpotify" v-if="!spotifyAccessToken">Spotify login</a>
+            <a href="#!" @click="fetchPlaylists" v-else>Spotify playlists</a>
+        </div>
 
         <p>{{ error }}</p>
     </div>
@@ -31,6 +37,12 @@
         },
         mounted: function () {
             this.spotifyAccessToken = localStorage.getItem('sp-accessToken');
+
+
+            var self = this;
+            scheduleService.getPendingPlaylists().then(it => {
+                self.pendingPlaylists = it;
+            });
         },
         data: function () {
             return {
@@ -39,7 +51,8 @@
                 playlists: [],
                 spotifyAccessToken: null,
                 spotifyAccessTokenExpiresIn: null,
-                db: null
+                db: null,
+                pendingPlaylists: []
             };
         },
         methods: {
@@ -85,7 +98,7 @@
                     .catch(error => self.error = error.message);
             },
 
-            addPlaylist(){
+            addPlaylist() {
                 scheduleService.create(new Date())
                     .then();
             }
