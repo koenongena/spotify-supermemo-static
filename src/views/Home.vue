@@ -11,6 +11,8 @@
             Token: {{spotifyAccessToken}}
         </p>
 
+        <button @click.stop.prevent="addPlaylist">Add playlist for today</button>
+
         <a :href="loginSpotify" v-if="!spotifyAccessToken">Spotify login</a>
         <a href="#!" @click="fetchPlaylists" v-else>Spotify playlists</a>
 
@@ -19,8 +21,8 @@
 </template>
 
 <script>
-    // import firebase from 'firebase';
     import axios from 'axios';
+    import {scheduleService} from '../services/StudyScheduleService';
 
     export default {
         name: 'Home',
@@ -36,7 +38,8 @@
                 error: "",
                 playlists: [],
                 spotifyAccessToken: null,
-                spotifyAccessTokenExpiresIn: null
+                spotifyAccessTokenExpiresIn: null,
+                db: null
             };
         },
         methods: {
@@ -80,6 +83,11 @@
                 axios.get(" https://api.spotify.com/v1/me/playlists", {headers: headers})
                     .then(response => self.playlists = response.data)
                     .catch(error => self.error = error.message);
+            },
+
+            addPlaylist(){
+                scheduleService.create(new Date())
+                    .then();
             }
         }
     }
