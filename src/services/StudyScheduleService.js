@@ -42,16 +42,23 @@ class StudyScheduleService {
     }
 
     getPendingPlaylists() {
-        const notYetDone = it => moment(it.time.toDate()).isBefore(moment()) && !it.done;
+        let filter = function (doc) {
+            const notYetDone = it => moment(it.time.toDate()).isBefore(moment()) && !it.done;
+            return doc.data().studyMoments.some(notYetDone)
+        };
 
+        return this.getPlaylists(filter);
+    }
+
+    getPlaylists(filter = function(){ return true}) {
         return this.db.collection("playlists").get().then((p) => {
-            let pendingPlaylists = [];
+            let playlists = [];
             p.forEach(doc => {
-                if (doc.data().studyMoments.some(notYetDone)){
-                    pendingPlaylists.push(doc.data());
+                if (filter(doc)) {
+                    playlists.push(doc.data());
                 }
             });
-            return pendingPlaylists;
+            return playlists;
         });
 
     }

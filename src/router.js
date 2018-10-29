@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home.vue'
 import Login from './views/Login.vue';
+import Schedule from './views/Schedule.vue';
 import SpotifyCallback from './views/SpotifyCallback.vue';
 import firebase from 'firebase';
 
@@ -17,7 +18,7 @@ let router = new Router({
         },
         {
             path: '/',
-            alias:'/home',
+            alias: '/home',
             name: 'home',
             component: Home,
             meta: {
@@ -25,7 +26,15 @@ let router = new Router({
             }
         },
         {
-            path:'/callback',
+            path: '/schedule',
+            name: 'home',
+            component: Schedule,
+            meta: {
+                requiresAuth: true
+            }
+        },
+        {
+            path: '/callback',
             name: 'callback',
             component: SpotifyCallback,
         },
