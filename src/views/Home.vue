@@ -57,8 +57,8 @@
         },
         methods: {
             loginSpotify: function () {
-                var CLIENT_ID = 'b04f52bb845a40909fad79d715ee2678';
-                var REDIRECT_URI = 'http://localhost:8080/callback';
+                var CLIENT_ID = process.env.VUE_APP_SPOTIFY_CLIENT_ID;
+                var REDIRECT_URI = process.env.VUE_APP_SPOTIFY_REDIRECT_URL;
 
                 function getLoginURL(scopes) {
                     return 'https://accounts.spotify.com/authorize?client_id=' + CLIENT_ID +
