@@ -1,5 +1,6 @@
 import firebase from 'firebase';
 import moment from "moment";
+import {Playlist} from "../model/Playlist";
 
 class StudyScheduleService {
 
@@ -55,7 +56,7 @@ class StudyScheduleService {
             let playlists = [];
             p.forEach(doc => {
                 if (filter(doc)) {
-                    playlists.push(doc.data());
+                    playlists.push(new Playlist(doc.data()));
                 }
             });
             return playlists;
