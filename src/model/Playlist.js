@@ -13,7 +13,7 @@ class Playlist {
 
 class StudyMoment {
     constructor(time, done) {
-        this.time = moment(time.toMillis()).startOf('day');
+        this.time = new Date(time.toMillis());
         this.done = done;
     }
 }

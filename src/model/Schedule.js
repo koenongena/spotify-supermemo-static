@@ -1,5 +1,11 @@
 import moment from 'moment';
 
+Date.prototype.addDays = function(days) {
+    var date = new Date(this.valueOf());
+    date.setDate(date.getDate() + days);
+    return date;
+}
+
 export default class Schedule {
     /**
      *
@@ -25,18 +31,14 @@ export default class Schedule {
         }
         let days = [];
         let day = this.minDay;
-        while (day.isBefore(this.maxDay.add(1, 'days'))) {
+        let dayAfterLastDay = this.maxDay.addDays(1);
+        while (day.getTime() < dayAfterLastDay.getTime()) {
+            console.log(day);
             days.push({
-                date: moment(day),
-                studyMoment0: null,
-                studyMoment1: null,
-                studyMoment2: null,
-                studyMoment3: null,
-                studyMoment4: null,
-                studyMoment5: null,
-                studyMoment6: null,
+                date: day,
+                playlists: [null,null,null,null,null,null,null]
             });
-            day = day.add(1, 'days');
+            day = day.addDays(1);
         }
 
         return days;
@@ -50,14 +52,14 @@ export default class Schedule {
      */
     static _findEarliestStudytime(playlists) {
         const compare = function (studyMoment, min) {
-            return studyMoment.isBefore(min);
+            return studyMoment.getTime() < min.getTime();
         };
 
         return Schedule._find(playlists, compare);
     }
 
 
-    static _find(playlists, compare, start = moment()) {
+    static _find(playlists, compare, start = new Date()) {
         let m = start;
         for (let i = 0; i < playlists.length; i++) {
             let studyMoments = playlists[i].studyMoments;
@@ -74,7 +76,7 @@ export default class Schedule {
 
     static _findLastStudytime(playlists) {
         const compare = function (studyMoment, current) {
-            return studyMoment.isAfter(current);
+            return moment(studyMoment).isAfter(moment(current));
         };
 
         return Schedule._find(playlists, compare, moment('1990-01-01'));
