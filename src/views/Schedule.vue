@@ -34,6 +34,7 @@
 <script>
     import moment from 'moment';
     import {scheduleService} from '../services/StudyScheduleService';
+    import Schedule from "../model/Schedule";
 
     export default {
         name: 'Home',
@@ -61,14 +62,8 @@
                 return moment(s).format('dddd DD MMM YYYY');
             },
             _calculateDays(){
-                let d = this._findEarliestStudytime(this.playlists);
-
-                this.days = [];
-                let tomorrow = moment().add(1, 'days');
-                while (d.isBefore(tomorrow)) {
-                    this.days.push({date: moment(d), studyMoment0: null, studyMoment1: null, studyMoment2: null, studyMoment3: null, studyMoment4: null, studyMoment5: null, studyMoment6: null, });
-                    d = d.add(1, 'days');
-                }
+                let schedule = new Schedule(this.playlists);
+                    this.days = schedule.days;
 
 
             },
