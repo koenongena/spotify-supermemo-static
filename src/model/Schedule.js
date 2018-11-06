@@ -1,10 +1,10 @@
 import moment from 'moment';
 
-Date.prototype.addDays = function(days) {
+Date.prototype.addDays = function (days) {
     var date = new Date(this.valueOf());
     date.setDate(date.getDate() + days);
     return date;
-}
+};
 
 export default class Schedule {
     /**
@@ -44,9 +44,10 @@ export default class Schedule {
             const playlist = this.playlists[i];
             for (let j = 0; j < playlist.studyMoments.length; j++) {
                 const studyMoment = playlist.studyMoments[j];
-                let dayIndex = days.findIndex(it => it.date.getTime() === studyMoment.time.getTime());
-                let day = days[dayIndex];
-                day.playlists[6 - j] = playlist.name;
+                let filteredDays = days.filter(it => it.date.getTime() === studyMoment.time.getTime());
+                if (filteredDays.length) {
+                    filteredDays[0].playlists[6 - j] = {name: playlist.name, done: studyMoment.done};
+                }
             }
         }
 

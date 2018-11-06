@@ -17,14 +17,8 @@
             </thead>
             <tbody>
             <tr v-for="day in days" :key="day.name">
-                <td>{{day.date}}</td>
-                <td>{{day.studyMoment6}}</td>
-                <td>{{day.studyMoment5}}</td>
-                <td>{{day.studyMoment4}}</td>
-                <td>{{day.studyMoment3}}</td>
-                <td>{{day.studyMoment2}}</td>
-                <td>{{day.studyMoment1}}</td>
-                <td>{{day.studyMoment0}}</td>
+                <td>{{formatDate(day.date)}}</td>
+                <td v-for="(playlist) in day.playlists" :class="{done: isDone(playlist)}">{{getName(playlist)}}</td>
             </tr>
             </tbody>
         </table>
@@ -49,7 +43,6 @@
             });
 
 
-
         },
         data: function () {
             return {
@@ -58,12 +51,21 @@
             };
         },
         methods: {
+            formatDate(d) {
+                return moment(d).format('dddd DD MMM YYYY');
+            },
+            isDone(playlist) {
+                return playlist && playlist.done;
+            },
+            getName(playlist) {
+                return (playlist || {name: ''}).name;
+            },
             realDate(s) {
                 return moment(s).format('dddd DD MMM YYYY');
             },
-            _calculateDays(){
+            _calculateDays() {
                 let schedule = new Schedule(this.playlists);
-                    this.days = schedule.days;
+                this.days = schedule.days;
 
 
             },
@@ -76,9 +78,9 @@
              */
             _findEarliestStudytime(playlists) {
                 let min = moment();
-                for(let i = 0; i < playlists.length; i++){
+                for (let i = 0; i < playlists.length; i++) {
                     let studyMoments = playlists[i].studyMoments;
-                    for (let k = 0; k < studyMoments.length; k++){
+                    for (let k = 0; k < studyMoments.length; k++) {
                         let studyMoment = studyMoments[k].time;
                         if (studyMoment.isBefore(min)) {
                             min = studyMoment;
@@ -94,4 +96,11 @@
 
 <style scoped>
 
+    td {
+        padding: 0.5em 1em 0.5em 1em;
+        border: 1px solid gray;
+    }
+    td.done {
+      background-color: green;
+    }
 </style>
