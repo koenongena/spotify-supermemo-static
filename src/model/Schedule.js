@@ -33,12 +33,21 @@ export default class Schedule {
         let day = this.minDay;
         let dayAfterLastDay = this.maxDay.addDays(1);
         while (day.getTime() < dayAfterLastDay.getTime()) {
-            console.log(day);
             days.push({
                 date: day,
                 playlists: [null,null,null,null,null,null,null]
             });
             day = day.addDays(1);
+        }
+
+        for (let i = 0; i < this.playlists.length; i++) {
+            const playlist = this.playlists[i];
+            for (let j = 0; j < playlist.studyMoments.length; j++) {
+                const studyMoment = playlist.studyMoments[j];
+                let dayIndex = days.findIndex(it => it.date.getTime() === studyMoment.time.getTime());
+                let day = days[dayIndex];
+                day.playlists[6 - j] = playlist.name;
+            }
         }
 
         return days;
