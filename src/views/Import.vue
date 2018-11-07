@@ -2,7 +2,11 @@
     <div>
         <h1>Import</h1>
 
-        <textarea v-model="csv"></textarea>
+        <div class="mdl-textfield mdl-js-textfield">
+            <textarea v-model="csv" class="mdl-textfield__input" rows="100" id="csvImport"></textarea>
+            <label class="mdl-textfield__label" for="csvImport">Playlists</label>
+        </div>
+
         <button @click="startImport">Import</button>
     </div>
 </template>
