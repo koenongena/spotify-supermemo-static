@@ -100,7 +100,8 @@
 
             addPlaylist() {
                 scheduleService.create(new Date())
-                    .then();
+                    .then((playlistName) => alert("Playlist " + playlistName + " added successfully"))
+                    .catch((error) => self._log.error(error))
             }
         }
     }

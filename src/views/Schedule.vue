@@ -18,7 +18,7 @@
             <tbody>
             <tr v-for="day in days" :key="day.name">
                 <td>{{formatDate(day.date)}}</td>
-                <td v-for="(playlist) in day.playlists" :class="{done: isDone(playlist)}">{{getName(playlist)}}</td>
+                <td v-for="(playlist) in playlistsWithKey(day.playlists)" :key="playlist.key" :class="{done: isDone(playlist)}">{{getName(playlist)}}</td>
             </tr>
             </tbody>
         </table>
@@ -51,6 +51,18 @@
             };
         },
         methods: {
+            playlistsWithKey(playlist){
+                let guid = function () {
+                    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+                        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16))
+                };
+
+                return {
+                    done: playlist.done,
+                    name: playlist.name,
+                    key: guid()
+                }
+            },
             formatDate(d) {
                 return moment(d).format('dddd DD MMM YYYY');
             },

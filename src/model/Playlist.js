@@ -1,5 +1,3 @@
-import moment from 'moment';
-
 class Playlist {
     constructor(data){
         this.name = data.name;
