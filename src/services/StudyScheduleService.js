@@ -25,9 +25,7 @@ class StudyScheduleService {
             return {time: timestamp.toDate(), done: done}
         };
 
-        return this.db.collection("users")
-            .doc(firebase.auth().currentUser.uid)
-            .collection("playlists")
+        return this.playlistsTable
             .doc(playlistName)
             .set({
                 name: playlistName,
@@ -54,7 +52,7 @@ class StudyScheduleService {
     }
 
     getPlaylists(filter = function(){ return true}) {
-        return this.db.collection("users").doc(firebase.auth().currentUser.uid).collection("playlists").get().then((p) => {
+        return this.db.collection("playlists").get().then((p) => {
             let playlists = [];
             p.forEach(doc => {
                 if (filter(doc)) {
@@ -66,6 +64,24 @@ class StudyScheduleService {
 
     }
 
+    setDone(playlistName) {
+        return this.playlistsTable
+            .where("name", "==", playlistName)
+            .get()
+            .then(response => alert(response));
+    }
+
+    setPending(playlistName) {
+        return this.playlistsTable
+            .where("name", "==", playlistName)
+            .get()
+            .then(response => alert(response));
+    }
+
+    get playlistsTable() {
+        return this.db.collection("playlists");
+    }
+
     get db() {
         if (this._db === null) {
             this._db = firebase.firestore();
@@ -73,7 +89,7 @@ class StudyScheduleService {
                 timestampsInSnapshots: true
             });
         }
-        return this._db;
+        return this._db.collection("users").doc(firebase.auth().currentUser.uid);
     }
 }
 

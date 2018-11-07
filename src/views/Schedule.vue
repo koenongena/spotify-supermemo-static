@@ -18,9 +18,10 @@
             <tbody>
             <tr v-for="day in days" :key="day.name" :id="formatDateAsISO(day.date)">
                 <td>{{formatDate(day.date)}}</td>
-                <td v-for="(playlist) in playlistsWithKey(day.playlists)" :key="playlist.key" :class="{done: isDone(playlist)}">
-                    {{getName(playlist)}}
-                </td>
+                <playlist-cell v-for="(playlist) in playlistsWithKey(day.playlists)"
+                               :key="playlist.key"
+                               :playlist="playlist"
+                               :day="day"/>
             </tr>
             </tbody>
         </table>
@@ -31,9 +32,11 @@
     import moment from 'moment';
     import {scheduleService} from '../services/StudyScheduleService';
     import Schedule from "../model/Schedule";
+    import PlaylistCell from "./PlaylistCell";
 
     export default {
         name: 'Home',
+        components: {PlaylistCell},
         props: {
             msg: String
         },
@@ -132,7 +135,5 @@
         border: 1px solid gray;
     }
 
-    td.done {
-        background-color: green;
-    }
+
 </style>
