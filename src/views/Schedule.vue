@@ -2,7 +2,7 @@
     <div class="home">
         <h1>Schedule</h1>
 
-        <table>
+        <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
             <thead>
             <tr>
                 <th>A</th>
@@ -16,9 +16,11 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="day in days" :key="day.name">
+            <tr v-for="day in days" :key="day.name" :id="formatDateAsISO(day.date)">
                 <td>{{formatDate(day.date)}}</td>
-                <td v-for="(playlist) in playlistsWithKey(day.playlists)" :key="playlist.key" :class="{done: isDone(playlist)}">{{getName(playlist)}}</td>
+                <td v-for="(playlist) in playlistsWithKey(day.playlists)" :key="playlist.key" :class="{done: isDone(playlist)}">
+                    {{getName(playlist)}}
+                </td>
             </tr>
             </tbody>
         </table>
@@ -40,7 +42,13 @@
             scheduleService.getPlaylists().then(it => {
                 self.playlists = it;
                 this._calculateDays();
-            });
+            }).then(() =>
+                self.$nextTick(() => {
+                    let todaysRowId = self.formatDateAsISO(new Date());
+                    document.getElementById(todaysRowId).scrollIntoView();
+                })
+            );
+
 
 
         },
@@ -51,20 +59,31 @@
             };
         },
         methods: {
-            playlistsWithKey(playlist){
+            playlistsWithKey(playlists) {
                 let guid = function () {
                     return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
                         (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16))
                 };
 
-                return {
-                    done: playlist.done,
-                    name: playlist.name,
-                    key: guid()
-                }
+                return playlists.map(playlist => {
+                    if (!playlist) {
+                        return {
+                            done: false,
+                            name: '',
+                            key: guid()
+                        }
+                    } else return {
+                        done: playlist.done,
+                        name: playlist.name,
+                        key: guid()
+                    };
+                });
             },
             formatDate(d) {
                 return moment(d).format('dddd DD MMM YYYY');
+            },
+            formatDateAsISO(d) {
+                return moment(d).format('YYYY-MM-DD');
             },
             isDone(playlist) {
                 return playlist && playlist.done;
@@ -112,7 +131,8 @@
         padding: 0.5em 1em 0.5em 1em;
         border: 1px solid gray;
     }
+
     td.done {
-      background-color: green;
+        background-color: green;
     }
 </style>
