@@ -21,11 +21,13 @@ class StudyScheduleService {
 
         let createStudymoment = function (date, additionalDays = 0) {
             let timestamp = date.clone().add(additionalDays, 'days');
-            let done = (timestamp.isBefore(moment()));
+            let done = false;
             return {time: timestamp.toDate(), done: done}
         };
 
-        return this.db.collection("playlists")
+        return this.db.collection("users")
+            .doc(firebase.auth().currentUser.uid)
+            .collection("playlists")
             .doc(playlistName)
             .set({
                 name: playlistName,
@@ -52,7 +54,7 @@ class StudyScheduleService {
     }
 
     getPlaylists(filter = function(){ return true}) {
-        return this.db.collection("playlists").get().then((p) => {
+        return this.db.collection("users").doc(firebase.auth().currentUser.uid).collection("playlists").get().then((p) => {
             let playlists = [];
             p.forEach(doc => {
                 if (filter(doc)) {
