@@ -45,13 +45,16 @@ class StudyScheduleService {
         })).then(() => playlistName);
     }
 
-    getPendingPlaylists() {
-        let filter = function (doc) {
-            const notYetDone = it => moment(it.time.toDate()).isBefore(moment()) && !it.done;
-            return doc.data().studyMoments.some(notYetDone)
-        };
-
-        return this.getPlaylists(filter);
+    getTodoList() {
+        return this.studiesTable
+            .where("done", "==", false)
+            .where("date", "<=", new Date())
+            .get()
+            .then(docs => {
+                let studies = [];
+                docs.forEach((doc) => studies.push(doc.data()));
+                return studies;
+            });
     }
 
     getPlaylists(filter = function () {

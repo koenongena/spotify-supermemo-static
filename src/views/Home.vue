@@ -12,7 +12,7 @@
 
         <h1>Stuff to do today</h1>
         <ul>
-            <li v-for="(pendingPlaylist, index) in pendingPlaylists" :key="index">{{pendingPlaylist.name}}</li>
+            <li v-for="(studyMoment, index) in studyMoments" :key="index">{{studyMoment.playlist}}</li>
         </ul>
 
         <button @click.stop.prevent="addPlaylist">Add playlist for today</button>
@@ -40,8 +40,8 @@
 
 
             var self = this;
-            scheduleService.getPendingPlaylists().then(it => {
-                self.pendingPlaylists = it;
+            scheduleService.getTodoList().then(it => {
+                self.studyMoments = it;
             });
         },
         data: function () {
@@ -52,7 +52,7 @@
                 spotifyAccessToken: null,
                 spotifyAccessTokenExpiresIn: null,
                 db: null,
-                pendingPlaylists: []
+                studyMoments: []
             };
         },
         methods: {
