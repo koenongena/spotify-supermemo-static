@@ -12,7 +12,7 @@
 
         <h1>Stuff to do today</h1>
         <ul>
-            <li v-for="(studyMoment, index) in studyMoments" :key="index">{{studyMoment.playlist}}</li>
+            <li v-for="(studyMoment, index) in studyMoments" :key="index" @click="setDone(studyMoment)">{{studyMoment.playlist}}</li>
         </ul>
 
         <button @click.stop.prevent="addPlaylist">Add playlist for today</button>
@@ -102,6 +102,18 @@
                 scheduleService.create(new Date())
                     .then((playlistName) => alert("Playlist " + playlistName + " added successfully"))
                     .catch((error) => self._log.error(error))
+            },
+            /**
+             *
+             * @param study {Study}
+             */
+            setDone(study) {
+                const doneHandler = function () {
+                    this.studyMoments = this.studyMoments.filter(sm => sm.id !== study.id);
+                }.bind(this);
+
+                scheduleService.setDone(study)
+                    .then(() => doneHandler());
             }
         }
     }

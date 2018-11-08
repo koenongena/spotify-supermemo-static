@@ -6,7 +6,7 @@
 
 <script>
     import moment from 'moment';
-    // import {scheduleService} from "../services/StudyScheduleService";
+    import {scheduleService} from "../services/StudyScheduleService";
     import Study from "../model/Study";
 
     export default {
@@ -34,11 +34,11 @@
                 return moment(s).format('dddd DD MMM YYYY');
             },
             toggleDone() {
-                // if (this.done) {
-                //     scheduleService.setPending(this.playlist.name, this.day.time);
-                // } else {
-                //     scheduleService.setDone(this.playlist.name, this.day.time);
-                // }
+                if (this.studyMoment.done) {
+                    scheduleService.setPending(this.studyMoment);
+                } else {
+                    scheduleService.setDone(this.studyMoment);
+                }
                 this.studyMoment.done = !this.studyMoment.done;
             }
         }

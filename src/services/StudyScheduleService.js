@@ -84,22 +84,24 @@ class StudyScheduleService {
 
     }
 
-    setDone(playlistName) {
-        return this.playlistsTable
-            .where("name", "==", playlistName)
-            .get()
-            .then(response => alert(response));
-    }
+    /**
+     *
+     * @param study {Study}
+     * @returns {Promise<void | never>}
+     */
+    setDone(study) {
+        this._log.debug("Setting ", study.id + " to done");
 
-    setPending(playlistName) {
-        return this.playlistsTable
-            .where("name", "==", playlistName)
-            .get()
-            .then(response => alert(response));
+        return this.studiesTable
+            .doc(study.id)
+            .update({done: true});
     }
+    setPending(study) {
+        this._log.debug("Setting ", study.id + " to pending");
 
-    get playlistsTable() {
-        return this.db.collection("playlists");
+        return this.studiesTable
+            .doc(study.id)
+            .update({done: false});
     }
 
     get studiesTable() {
