@@ -96,12 +96,24 @@ class StudyScheduleService {
             .doc(study.id)
             .update({done: true});
     }
+
     setPending(study) {
         this._log.debug("Setting ", study.id + " to pending");
 
         return this.studiesTable
             .doc(study.id)
             .update({done: false});
+    }
+
+    deletePlaylist(playlistName) {
+        return this.studiesTable
+            .where("playlist", "==", playlistName)
+            .get().then(docs => {
+                docs.forEach(doc => {
+                    doc.ref.delete();
+                })
+            });
+
     }
 
     get studiesTable() {

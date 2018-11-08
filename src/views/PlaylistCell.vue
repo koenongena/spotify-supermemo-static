@@ -1,6 +1,7 @@
 <template>
     <td :class="{'done': studyMoment.done}">
         <a href="#!" @click.stop.prevent="toggleDone">{{studyMoment.playlist}}</a>
+        <a href="#!" @click.stop.prevent="remove"><i class="material-icons">delete</i> Remove</a>
     </td>
 </template>
 
@@ -40,6 +41,16 @@
                     scheduleService.setDone(this.studyMoment);
                 }
                 this.studyMoment.done = !this.studyMoment.done;
+            },
+            remove() {
+                let handleChanges = function () {
+                    alert(this.studyMoment.playlist + " was deleted");
+                }.bind(this);
+
+                scheduleService
+                    .deletePlaylist(this.studyMoment.playlist)
+                    .then(() => handleChanges());
+
             }
         }
     }
