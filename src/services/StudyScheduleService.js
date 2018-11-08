@@ -19,27 +19,30 @@ class StudyScheduleService {
         let startOfTheDay = moment(date).startOf('day');
         let playlistName = startOfTheDay.format("YYYY-MM-DD");
 
-        let createStudymoment = function (date, additionalDays = 0) {
+        let createStudyMoment = function (date, additionalDays = 0) {
             let timestamp = date.clone().add(additionalDays, 'days');
             let done = false;
-            return {time: timestamp.toDate(), done: done}
+            let id = timestamp.format("YYYY-MM-DD") + "__" + playlistName;
+            return {date: timestamp.toDate(), done: done, id: id, playlist: playlistName}
         };
 
-        return this.playlistsTable
-            .doc(playlistName)
-            .set({
-                name: playlistName,
-                studyMoments: [
-                    createStudymoment(startOfTheDay),
-                    createStudymoment(startOfTheDay, 2),
-                    createStudymoment(startOfTheDay, 10),
-                    createStudymoment(startOfTheDay, 30),
-                    createStudymoment(startOfTheDay, 60),
-                    createStudymoment(startOfTheDay, 120),
-                    createStudymoment(startOfTheDay, 240),
-                ]
-            })
-            .then(() => playlistName);
+        let sm = [
+            createStudyMoment(startOfTheDay),
+            createStudyMoment(startOfTheDay, 2),
+            createStudyMoment(startOfTheDay, 10),
+            createStudyMoment(startOfTheDay, 30),
+            createStudyMoment(startOfTheDay, 60),
+            createStudyMoment(startOfTheDay, 120),
+            createStudyMoment(startOfTheDay, 240),
+        ];
+
+        const self = this;
+        return Promise.all(sm.map(studyMoment => {
+            return self.studiesTable
+                .doc(studyMoment.id)
+                .set(studyMoment)
+
+        })).then(() => playlistName);
     }
 
     getPendingPlaylists() {
@@ -51,7 +54,9 @@ class StudyScheduleService {
         return this.getPlaylists(filter);
     }
 
-    getPlaylists(filter = function(){ return true}) {
+    getPlaylists(filter = function () {
+        return true
+    }) {
         return this.db.collection("playlists").get().then((p) => {
             let playlists = [];
             p.forEach(doc => {
@@ -80,6 +85,10 @@ class StudyScheduleService {
 
     get playlistsTable() {
         return this.db.collection("playlists");
+    }
+
+    get studiesTable() {
+        return this.db.collection("studies");
     }
 
     get db() {
