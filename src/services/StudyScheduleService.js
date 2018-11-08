@@ -1,6 +1,6 @@
 import firebase from 'firebase';
 import moment from "moment";
-import {Playlist} from "../model/Playlist";
+import Study from "../model/Study";
 
 class StudyScheduleService {
 
@@ -19,28 +19,27 @@ class StudyScheduleService {
         let startOfTheDay = moment(date).startOf('day');
         let playlistName = startOfTheDay.format("YYYY-MM-DD");
 
-        let createStudyMoment = function (date, additionalDays = 0) {
+        let createStudy = function (iteration = 0, date, additionalDays = 0) {
             let timestamp = date.clone().add(additionalDays, 'days');
-            let done = false;
             let id = timestamp.format("YYYY-MM-DD") + "__" + playlistName;
-            return {date: timestamp.toDate(), done: done, id: id, playlist: playlistName}
+            return new Study(id, timestamp.toDate(), playlistName, iteration);
         };
 
         let sm = [
-            createStudyMoment(startOfTheDay),
-            createStudyMoment(startOfTheDay, 2),
-            createStudyMoment(startOfTheDay, 10),
-            createStudyMoment(startOfTheDay, 30),
-            createStudyMoment(startOfTheDay, 60),
-            createStudyMoment(startOfTheDay, 120),
-            createStudyMoment(startOfTheDay, 240),
+            createStudy(0, startOfTheDay),
+            createStudy(1, startOfTheDay, 2),
+            createStudy(2, startOfTheDay, 10),
+            createStudy(3, startOfTheDay, 30),
+            createStudy(4, startOfTheDay, 60),
+            createStudy(5, startOfTheDay, 120),
+            createStudy(6, startOfTheDay, 240),
         ];
 
         const self = this;
         return Promise.all(sm.map(studyMoment => {
             return self.studiesTable
                 .doc(studyMoment.id)
-                .set(studyMoment)
+                .set(JSON.parse(JSON.stringify(studyMoment)))
 
         })).then(() => playlistName);
     }
@@ -57,17 +56,30 @@ class StudyScheduleService {
             });
     }
 
-    getPlaylists(filter = function () {
-        return true
-    }) {
-        return this.db.collection("playlists").get().then((p) => {
-            let playlists = [];
-            p.forEach(doc => {
-                if (filter(doc)) {
-                    playlists.push(new Playlist(doc.data()));
-                }
+    getDays() {
+        let groupByDate = function (studies) {
+            const days = studies.reduce(function (acc, s) {
+                const p = moment(s.date).format("YYYY-MM-DD");
+                if (!acc[0].hasOwnProperty(p)) acc[0][p] = [];
+                acc[0][p].push(s);
+                return acc;
+            }, [{}])
+                .reduce(function (acc, v) {
+                    Object.keys(v).forEach(function (k) {
+                        acc.push({date: k, studyMoments: v[k]})
+                    });
+                    return acc;
+                }, []);
+
+            return days;
+        };
+        return this.studiesTable.get().then((docs) => {
+            let studies = [];
+            docs.forEach((doc) => {
+                studies.push(Study.parse(doc.data()));
             });
-            return playlists;
+
+            return groupByDate(studies);
         });
 
     }

@@ -1,18 +1,20 @@
 <template>
-    <td :key="playlist.key" :class="{'done': done}">
-        <a href="#!" @click.stop.prevent="toggleDone">{{getName(playlist)}}</a>
+    <td :class="{'done': studyMoment.done}">
+        <a href="#!" @click.stop.prevent="toggleDone">{{studyMoment.playlist}}</a>
     </td>
 </template>
 
 <script>
     import moment from 'moment';
-    import {scheduleService} from "../services/StudyScheduleService";
+    // import {scheduleService} from "../services/StudyScheduleService";
+    import Study from "../model/Study";
 
     export default {
         name: 'PlaylistCell',
         props: {
-            playlist: null,
-            day: null
+            studyMoment: {
+                type: Study
+            }
         },
         data() {
             return {
@@ -32,12 +34,12 @@
                 return moment(s).format('dddd DD MMM YYYY');
             },
             toggleDone() {
-                if (this.done) {
-                    scheduleService.setPending(this.playlist.name, this.day.time);
-                } else {
-                    scheduleService.setDone(this.playlist.name, this.day.time);
-                }
-                this.done = !this.done;
+                // if (this.done) {
+                //     scheduleService.setPending(this.playlist.name, this.day.time);
+                // } else {
+                //     scheduleService.setDone(this.playlist.name, this.day.time);
+                // }
+                this.studyMoment.done = !this.studyMoment.done;
             }
         }
     }
