@@ -22,7 +22,8 @@ class StudyScheduleService {
         let createStudy = function (iteration = 0, date, additionalDays = 0) {
             let timestamp = date.clone().add(additionalDays, 'days');
             let id = timestamp.format("YYYY-MM-DD") + "__" + playlistName;
-            return new Study(id, timestamp.toDate(), playlistName, iteration);
+            let done = false;
+            return new Study(id, timestamp.toDate(), playlistName, iteration, done);
         };
 
         let sm = [
@@ -39,8 +40,13 @@ class StudyScheduleService {
         return Promise.all(sm.map(studyMoment => {
             return self.studiesTable
                 .doc(studyMoment.id)
-                .set(JSON.parse(JSON.stringify(studyMoment)))
-
+                .set({
+                    id: studyMoment.id,
+                    date: studyMoment.date,
+                    iteration: studyMoment.iteration,
+                    playlist: studyMoment.playlist,
+                    done: studyMoment.done
+                })
         })).then(() => playlistName);
     }
 
