@@ -73,7 +73,7 @@ class StudyScheduleService {
 
             return days;
         };
-        return this.studiesTable.get().then((docs) => {
+        return this.studiesTable.where("date", ">=", moment().add(-30, 'days').toDate()).get().then((docs) => {
             let studies = [];
             docs.forEach((doc) => {
                 studies.push(Study.parse(doc.data()));

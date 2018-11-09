@@ -1,7 +1,7 @@
 <template>
     <td :class="{'done': studyMoment.done}">
         <a href="#!" @click.stop.prevent="toggleDone">{{studyMoment.playlist}}</a>
-        <a href="#!" @click.stop.prevent="remove"><i class="material-icons">delete</i> Remove</a>
+        <a href="#!" @click.stop.prevent="remove"><i class="material-icons">delete</i> </a>
     </td>
 </template>
 

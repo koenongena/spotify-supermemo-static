@@ -10,17 +10,17 @@
             Yippie, you are logged in with Spotify.
         </p>
 
-        <h1>Stuff to do today</h1>
-        <ul>
-            <li v-for="(studyMoment, index) in studyMoments" :key="index" @click="setDone(studyMoment)">{{studyMoment.playlist}}</li>
-        </ul>
+        <h1>TO DO</h1>
+
+        <to-do-list/>
+
+
+        <!--<ul>-->
+            <!--<li v-for="(studyMoment, index) in studyMoments" :key="index">-->
+                <!--<a href="#!" @click.stop.prevent="setDone(studyMoment)">Done</a></li>-->
+        <!--</ul>-->
 
         <button @click.stop.prevent="addPlaylist">Add playlist for today</button>
-
-        <div>
-            <a :href="loginSpotify" v-if="!spotifyAccessToken">Spotify login</a>
-            <a href="#!" @click="fetchPlaylists" v-else>Spotify playlists</a>
-        </div>
 
         <p>{{ error }}</p>
     </div>
@@ -29,9 +29,11 @@
 <script>
     import axios from 'axios';
     import {scheduleService} from '../services/StudyScheduleService';
+    import ToDoList from "./ToDoList";
 
     export default {
         name: 'Home',
+        components: {ToDoList},
         props: {
             msg: String
         },
