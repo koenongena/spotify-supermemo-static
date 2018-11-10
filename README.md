@@ -24,3 +24,16 @@ npm run test
 ```
 npm run lint
 ```
+
+### Deploying
+
+See https://cli.vuejs.org/guide/deployment.html#firebase
+
+#### Firebase
+
+    npm install -g firebase-tools
+    npm run build
+    firebase deploy --only hosting
+    
+
+ 
