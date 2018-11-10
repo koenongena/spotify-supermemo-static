@@ -6,7 +6,7 @@ import router from './router'
 Vue.config.productionTip = false;
 
 const config = {
-    apiKey: process.env.VUE_APP_FIREBASE_API_KEY,
+    apiKey: "AIzaSyAw8sEeK2Q6uy5uB9jtTKZu185ZE23hmEM",
     authDomain: "spotify-supermemo.firebaseapp.com",
     databaseURL: "https://spotify-supermemo.firebaseio.com",
     projectId: "spotify-supermemo",
