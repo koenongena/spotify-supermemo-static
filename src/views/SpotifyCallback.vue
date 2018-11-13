@@ -3,6 +3,8 @@
 </template>
 
 <script>
+    import moment from 'moment';
+
     export default {
         name: "SpotifyCallback",
         mounted: function(){
@@ -22,7 +24,7 @@
             localStorage.setItem("sp-accessToken", hashParams['access_token']);
             localStorage.setItem("sp-accessTokenType", hashParams['token_type']);
             localStorage.setItem("sp-accessTokenExpiresIn", hashParams['expires_in']);
-            localStorage.setItem("sp-accessTokenExpiration", Date.now() + hashParams['expires_in']);
+            localStorage.setItem("sp-accessTokenExpiration", moment(Date.now()).add(hashParams['expires_in'], 'seconds').toDate());
 
             setTimeout(() => window.close(), 1000);
         }

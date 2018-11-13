@@ -39,9 +39,15 @@
         },
         mounted: function () {
             this.spotifyAccessToken = localStorage.getItem('sp-accessToken');
+            if (this.spotifyAccessToken) {
+                let expirationDate = localStorage.getItem("sp-accessTokenExpiration");
+                if (!expirationDate || expirationDate < new Date()) {
+                    this.spotifyAccessToken = null;
+                    localStorage.setItem('sp-accessToken', null)
+                }
+            }
 
-
-            var self = this;
+            const self = this;
             scheduleService.getTodoList().then(it => {
                 self.studyMoments = it;
             });
