@@ -5,6 +5,7 @@ import Import from './views/Import.vue'
 import Login from './views/Login.vue';
 import Schedule from './views/Schedule.vue';
 import SpotifyCallback from './views/SpotifyCallback.vue';
+import SpotifyPlaylists from './views/SpotifyPlaylists.vue';
 import firebase from 'firebase';
 
 Vue.use(Router);
@@ -45,6 +46,11 @@ let router = new Router({
             path: '/callback',
             name: 'callback',
             component: SpotifyCallback,
+        },
+        {
+            path: '/spotify-playlists',
+            name: 'spotify-playlists',
+            component: SpotifyPlaylists,
         },
         {
             path: '/login',
