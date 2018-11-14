@@ -21,7 +21,6 @@
 </template>
 
 <script>
-    import axios from 'axios';
     import {scheduleService} from '../services/StudyScheduleService';
     import ToDoList from "./ToDoList";
     import SpotifyLogin from "./SpotifyLogin";
@@ -50,15 +49,6 @@
             };
         },
         methods: {
-            fetchPlaylists: function () {
-                let self = this;
-                let headers = {
-                    'Authorization': "Bearer " + self.spotifyAccessToken
-                };
-                axios.get(" https://api.spotify.com/v1/me/playlists", {headers: headers})
-                    .then(response => self.playlists = response.data)
-                    .catch(error => self.error = error.message);
-            },
 
             addPlaylist() {
                 scheduleService.create(new Date())

@@ -5,16 +5,16 @@
         <spotify-login></spotify-login>
 
         <ul>
-            <li v-for="playlist in playlists" :key="playlist.id">{{playlist.name}}</li>
+            <li v-for="playlist in playlists" :key="playlist.id">{{playlist.name}}
+                <a @click.stop.prevent="scan(playlist)" >Scan</a></li>
         </ul>
     </div>
 </template>
 
 <script>
-    import axios from 'axios';
     import ToDoList from "./ToDoList";
     import SpotifyLogin from "./SpotifyLogin";
-    import SpotifyPlaylist from "../model/SpotifyPlaylist";
+    import {spotifyDataService} from "../services/SpotifyService";
 
     export default {
         name: 'Home',
@@ -23,8 +23,6 @@
             msg: String
         },
         mounted: function () {
-            this.spotifyAccessToken = localStorage.getItem('sp-accessToken');
-
             this.fetchPlaylists();
         },
         data: function () {
@@ -33,31 +31,19 @@
             };
         },
         methods: {
-            fetchPlaylists: function () {
-                let self = this;
-                let headers = {
-                    'Authorization': "Bearer " + self.spotifyAccessToken
-                };
-
-                this._fetchPlaylists("https://api.spotify.com/v1/me/playlists");
-
+            /**
+             *
+             * @param playlist {SpotifyPlaylist}
+             */
+            scan(playlist) {
+                spotifyDataService.getTracks(playlist)
+                    .then(response => response.data);
             },
-
-            _fetchPlaylists(url) {
-                let self = this;
-                let headers = {
-                    'Authorization': "Bearer " + self.spotifyAccessToken
-                };
-
-                axios.get(url, {headers: headers})
-                    .then(response => {
-                        let data = response.data;
-                        self.playlists = self.playlists.concat(data.items.map(it => new SpotifyPlaylist(it)));
-                        if (data.next) {
-                            self._fetchPlaylists(data.next);
-                        }
-                    })
-                    .catch(error => self.error = error.message);
+            fetchPlaylists: function () {
+                const self= this;
+                spotifyDataService
+                    .fetchPlaylists()
+                    .then(playlists => self.playlists = playlists);
             }
         }
     }
