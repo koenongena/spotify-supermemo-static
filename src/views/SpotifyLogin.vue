@@ -18,7 +18,7 @@
         mounted: function () {
             this.spotifyAccessToken = localStorage.getItem('sp-accessToken');
             if (this.spotifyAccessToken) {
-                let expirationDate = localStorage.getItem("sp-accessTokenExpiration");
+                let expirationDate = Date.parse(localStorage.getItem("sp-accessTokenExpiration"));
                 if (!expirationDate || expirationDate < new Date()) {
                     this.spotifyAccessToken = null;
                     localStorage.setItem('sp-accessToken', null)

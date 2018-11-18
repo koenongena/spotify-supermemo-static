@@ -12,23 +12,28 @@ class SpotifyService {
     }
 
     fetchPlaylists() {
-        return this._fetchPlaylists("https://api.spotify.com/v1/me/playlists");
-    }
-
-    _fetchPlaylists(url) {
         let self = this;
 
-
-        return axios.get(url, {headers: self.headers})
-            .then(response => {
-                let data = response.data;
-                let playlists = data.items.map(it => new SpotifyPlaylist(it));
-                if (data.next) {
-                    self._fetchPlaylists(data.next)
-                        .then(pls => playlists = playlists.concat(pls));
-                }
-                return playlists;
+        const fetch = function (url, responses) {
+            return new Promise((resolve) => {
+                axios.get(url, {headers: self.headers})
+                    .then(response => {
+                        responses.push(response);
+                        if (response.data.next) {
+                            fetch(response.data.next, responses).then(() => resolve());
+                        } else {
+                            resolve();
+                        }
+                    })
             });
+        };
+        let responses = [];
+        return fetch("https://api.spotify.com/v1/me/playlists", responses)
+            .then(() => {
+                return responses.flatMap(response => response.data.items.map(it  => new SpotifyPlaylist(it)));
+            });
+
+
     }
 
     /**
