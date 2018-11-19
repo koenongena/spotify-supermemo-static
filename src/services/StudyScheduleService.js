@@ -145,7 +145,7 @@ class StudyScheduleService {
         return this._db.collection("users").doc(firebase.auth().currentUser.uid);
     }
 
-    fetchPlaylists(){
+    fetchUnscannedPlaylists(){
         return this.playlistsTable.where("scanned", "==", false).get()
             .then((docs) => {
                 let playlists = [];
@@ -188,6 +188,18 @@ class StudyScheduleService {
                 uri: playlist.uri,
                 scanned: false
             })
+    }
+
+    getTracksInTrackedPlaylists(){
+        return this.db.collection("scanlist").get()
+            .then((docs) => {
+                let playlists = [];
+                docs.forEach(() => {
+
+                });
+
+                return playlists;
+            });
     }
 }
 

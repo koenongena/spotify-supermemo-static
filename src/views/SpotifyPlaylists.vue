@@ -10,6 +10,16 @@
             <li v-for="playlist in playlists" :key="playlist.id">{{playlist.name}}
                 <a @click.stop.prevent="scan(playlist)">Scan</a></li>
         </ul>
+
+        <h1>Tracked playlists</h1>
+
+        <a href="#!" @click="findNewSongs">Find new songs</a>
+
+        <ul>
+            <li v-for="song in newSongs" :key="song.id">{{song.name}}</li>
+        </ul>
+
+
     </div>
 </template>
 
@@ -32,7 +42,8 @@
         },
         data: function () {
             return {
-                playlists: []
+                playlists: [],
+                newSongs: []
             };
         },
         methods: {
@@ -64,8 +75,14 @@
             fetchPlaylists: function () {
                 const self = this;
                 scheduleService
-                    .fetchPlaylists()
+                    .fetchUnscannedPlaylists()
                     .then(playlists => self.playlists = playlists);
+            },
+            findNewSongs(){
+                const self = this;
+                scheduleService
+                    .getTracksInTrackedPlaylists()
+                    .then((tracks) => self.newSongs = tracks);
             }
         }
     }
