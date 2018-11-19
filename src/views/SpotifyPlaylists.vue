@@ -4,14 +4,18 @@
 
         <spotify-login></spotify-login>
 
+        <a href="#!" @click="scanAllSupermemoPlaylists" class="mdl-button mdl-button--colored">Import all playlists</a>
+
         <ul>
             <li v-for="playlist in playlists" :key="playlist.id">{{playlist.name}}
-                <a @click.stop.prevent="scan(playlist)" >Scan</a></li>
+                <a @click.stop.prevent="scan(playlist)">Scan</a></li>
         </ul>
     </div>
 </template>
 
 <script>
+    /* eslint-disable no-console */
+
     import ToDoList from "./ToDoList";
     import SpotifyLogin from "./SpotifyLogin";
     import {spotifyDataService} from "../services/SpotifyService";
@@ -39,15 +43,27 @@
             scan(playlist) {
                 let saveTracks = function (tracks) {
                     for (const track of tracks) {
-                        scheduleService.saveTrack(track)
+                        scheduleService.saveTrack(track, playlist)
                     }
                 };
                 spotifyDataService.getTracks(playlist)
                     .then(tracks => saveTracks(tracks));
             },
+            scanAllSupermemoPlaylists() {
+                function _isSupermemoPlaylist(pl) {
+                    return new RegExp("^\\d{4}-\\d{2}-\\d{2}$").test(pl.name);
+                }
+
+                const self = this;
+                for (const pl of this.playlists) {
+                    if (_isSupermemoPlaylist(pl)) {
+                        self.scan(pl);
+                    }
+                }
+            },
             fetchPlaylists: function () {
-                const self= this;
-                spotifyDataService
+                const self = this;
+                scheduleService
                     .fetchPlaylists()
                     .then(playlists => self.playlists = playlists);
             }

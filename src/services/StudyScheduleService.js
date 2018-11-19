@@ -1,6 +1,7 @@
 import firebase from 'firebase';
 import moment from "moment";
 import Study from "../model/Study";
+import SpotifyPlaylist from "../model/SpotifyPlaylist";
 
 class StudyScheduleService {
 
@@ -130,6 +131,10 @@ class StudyScheduleService {
         return this.db.collection("tracks");
     }
 
+    get playlistsTable() {
+        return this.db.collection("playlists");
+    }
+
     get db() {
         if (this._db === null) {
             this._db = firebase.firestore();
@@ -140,17 +145,48 @@ class StudyScheduleService {
         return this._db.collection("users").doc(firebase.auth().currentUser.uid);
     }
 
+    fetchPlaylists(){
+        return this.playlistsTable.where("scanned", "==", false).get()
+            .then((docs) => {
+                let playlists = [];
+                docs.forEach((doc) => {
+                    let documentData = doc.data();
+                    playlists.push(new SpotifyPlaylist(documentData));
+                });
+
+                return playlists;
+            })
+    }
+
+
     /**
      *
      * @param track {SpotifyTrack}
      */
-    saveTrack(track) {
+    saveTrack(track, playlist) {
         this.tracksTable.doc(track.id)
             .set({
                 id: track.id,
                 artist: track.artist,
                 title: track.title,
                 playlist: track.playlist
+            });
+
+        this.playlistsTable.doc(playlist.name)
+            .update({scanned: true})
+    }
+
+    /**
+     *
+     * @param playlist {SpotifyPlaylist}
+     */
+    savePlaylist(playlist) {
+        this.playlistsTable.doc(playlist.name)
+            .set({
+                id: playlist.id,
+                name: playlist.name,
+                uri: playlist.uri,
+                scanned: false
             })
     }
 }
