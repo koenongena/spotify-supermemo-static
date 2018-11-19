@@ -12,28 +12,26 @@ class SpotifyService {
     }
 
     fetchPlaylists() {
-        let self = this;
-
-        const fetch = function (url, responses) {
-            return new Promise((resolve) => {
-                axios.get(url, {headers: self.headers})
-                    .then(response => {
-                        responses.push(response);
-                        if (response.data.next) {
-                            fetch(response.data.next, responses).then(() => resolve());
-                        } else {
-                            resolve();
-                        }
-                    })
-            });
-        };
         let responses = [];
-        return fetch("https://api.spotify.com/v1/me/playlists", responses)
+        return this._fetch("https://api.spotify.com/v1/me/playlists", responses)
             .then(() => {
-                return responses.flatMap(response => response.data.items.map(it  => new SpotifyPlaylist(it)));
+                return responses.flatMap(response => response.data.items.map(it => new SpotifyPlaylist(it)));
             });
+    }
 
-
+    _fetch(url, responses) {
+        const self = this;
+        return new Promise((resolve) => {
+            axios.get(url, {headers: self.headers})
+                .then(response => {
+                    responses.push(response);
+                    if (response.data.next) {
+                        self._fetch(response.data.next, responses).then(() => resolve());
+                    } else {
+                        resolve();
+                    }
+                })
+        });
     }
 
     /**
@@ -42,10 +40,12 @@ class SpotifyService {
      * @returns {Promise<AxiosResponse<any> | never>}
      */
     getTracks(playlist) {
-        //TODO als er meer dan 100 items in de lijst zitten => blijven scannen
-        const self = this;
-        return axios.get("https://api.spotify.com/v1/playlists/" + playlist.id + "/tracks ", {headers: self.headers})
-            .then(response => response.data.items.map(it => SpotifyTrack.parse(it)));
+        let responses = [];
+        let url = "https://api.spotify.com/v1/playlists/" + playlist.id + "/tracks ";
+        return this._fetch(url, responses)
+            .then(() => {
+                return responses.flatMap(response => response.data.items.map(json => new SpotifyTrack(json.track.id, playlist.name, json.track.artists[0].name, json.track.name)))
+            });
     }
 }
 

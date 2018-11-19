@@ -15,6 +15,7 @@
     import ToDoList from "./ToDoList";
     import SpotifyLogin from "./SpotifyLogin";
     import {spotifyDataService} from "../services/SpotifyService";
+    import {scheduleService} from "../services/StudyScheduleService";
 
     export default {
         name: 'Home',
@@ -36,8 +37,13 @@
              * @param playlist {SpotifyPlaylist}
              */
             scan(playlist) {
+                let saveTracks = function (tracks) {
+                    for (const track of tracks) {
+                        scheduleService.saveTrack(track)
+                    }
+                };
                 spotifyDataService.getTracks(playlist)
-                    .then(response => response.data);
+                    .then(tracks => saveTracks(tracks));
             },
             fetchPlaylists: function () {
                 const self= this;

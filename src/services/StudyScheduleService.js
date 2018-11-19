@@ -126,6 +126,10 @@ class StudyScheduleService {
         return this.db.collection("studies");
     }
 
+    get tracksTable() {
+        return this.db.collection("tracks");
+    }
+
     get db() {
         if (this._db === null) {
             this._db = firebase.firestore();
@@ -134,6 +138,20 @@ class StudyScheduleService {
             });
         }
         return this._db.collection("users").doc(firebase.auth().currentUser.uid);
+    }
+
+    /**
+     *
+     * @param track {SpotifyTrack}
+     */
+    saveTrack(track) {
+        this.tracksTable.doc(track.id)
+            .set({
+                id: track.id,
+                artist: track.artist,
+                title: track.title,
+                playlist: track.playlist
+            })
     }
 }
 

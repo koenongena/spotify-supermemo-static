@@ -1,10 +1,9 @@
 export default class SpotifyTrack {
 
-    constructor(id) {
+    constructor(id, playlist = "?", artist, title) {
         this.id = id;
-    }
-
-    static parse(json) {
-        return new SpotifyTrack(json.track.id)
+        this.playlist = playlist;
+        this.artist = artist;
+        this.title = title;
     }
 }
