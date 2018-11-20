@@ -3,6 +3,7 @@ export default class SpotifyPlaylist {
         this.id = json.id;
         this.name = json.name;
         this.tracks = json.tracks;
+        this.scanned = json.scanned;
         this.uri = json.uri;
     }
 }

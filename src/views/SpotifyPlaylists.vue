@@ -4,11 +4,11 @@
 
         <spotify-login></spotify-login>
 
-        <a href="#!" @click="scanAllSupermemoPlaylists" class="mdl-button mdl-button--colored">Import all playlists</a>
+        <a href="#!" @click="getUnscannedPlaylists" class="mdl-button mdl-button--colored">Find unscanned playlists</a>
 
         <ul>
             <li v-for="playlist in playlists" :key="playlist.id">{{playlist.name}}
-                <a @click.stop.prevent="scan(playlist)">Scan</a></li>
+                <a href.stop.prevent="#!" @click.stop.prevent="scan(playlist)">Scan</a></li>
         </ul>
 
         <h1>Tracked playlists</h1>
@@ -62,17 +62,34 @@
                 spotifyDataService.getTracks(playlist)
                     .then(tracks => saveTracks(tracks));
             },
-            scanAllSupermemoPlaylists() {
-                function _isSupermemoPlaylist(pl) {
-                    return new RegExp("^\\d{4}-\\d{2}-\\d{2}$").test(pl.name);
-                }
-
+            getUnscannedPlaylists() {
                 const self = this;
-                for (const pl of this.playlists) {
-                    if (_isSupermemoPlaylist(pl)) {
-                        self.scan(pl);
+
+                let _isSupermemoPlaylist = function (pl) {
+                    return new RegExp("^\\d{4}-\\d{2}-\\d{2}$").test(pl.name);
+
+                };
+
+                let addIfUnscanned = function (pl) {
+                    scheduleService.getPlaylistsWithName(pl.name)
+                        .then(playlist => {
+                            if (!playlist.scanned) {
+                                self.playlists.push(pl);
+                            }
+                        });
+                };
+
+                let addPlaylists = function (playlists) {
+                    for (const playlist of playlists) {
+                        if (_isSupermemoPlaylist(playlist)) {
+                            addIfUnscanned(playlist);
+                        }
                     }
-                }
+                };
+
+                spotifyDataService
+                    .fetchPlaylists()
+                    .then(playlists => addPlaylists(playlists));
             },
             fetchPlaylists: function () {
                 const self = this;

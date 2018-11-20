@@ -217,6 +217,18 @@ class StudyScheduleService {
         return this.tracksTable.where("id", "==", track.id).get()
             .then(docs => docs.size === 0);
     }
+
+    /**
+     *
+     * @param playlistName
+     * @returns {Promise}
+     */
+    getPlaylistsWithName(playlistName) {
+        return this.playlistsTable
+            .doc(playlistName)
+            .get()
+            .then((doc) => (!doc.exists ? new SpotifyPlaylist({}) : new SpotifyPlaylist(doc.data())));
+    }
 }
 
 let scheduleService = new StudyScheduleService();
