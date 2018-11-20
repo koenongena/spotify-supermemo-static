@@ -15,11 +15,13 @@
 
         <a href="#!" @click="findNewSongs">Find new songs</a>
 
-        <ul>
-            <li v-for="song in newSongs" :key="song.id">{{song.name}}</li>
+        <ul class="demo-list-item mdl-list">
+            <li class="mdl-list__item" v-for="song in newSongs" :key="song.id">
+                <span class="mdl-list__item-primary-content">
+                 {{song.artist}} - {{song.title}}
+                </span>
+            </li>
         </ul>
-
-
     </div>
 </template>
 
@@ -78,11 +80,24 @@
                     .fetchUnscannedPlaylists()
                     .then(playlists => self.playlists = playlists);
             },
-            findNewSongs(){
+            findNewSongs() {
                 const self = this;
-                scheduleService
-                    .getTracksInTrackedPlaylists()
-                    .then((tracks) => self.newSongs = tracks);
+                self.newSongs = [];
+                scheduleService.getTrackedPlaylists()
+                    .then((playlists) => {
+                        for (const playlist of playlists) {
+                            spotifyDataService.getTracks(playlist)
+                                .then(tracks => {
+                                    for (const track of tracks) {
+                                        scheduleService.isNew(track).then(b => {
+                                            if (b) self.newSongs.push(track)
+                                        })
+                                    }
+                                });
+                        }
+
+                    });
+
             }
         }
     }

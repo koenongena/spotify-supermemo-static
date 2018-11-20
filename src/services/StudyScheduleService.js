@@ -201,6 +201,22 @@ class StudyScheduleService {
                 return playlists;
             });
     }
+
+    getTrackedPlaylists(){
+        return this.db.collection("scanlist").get()
+            .then((docs) => {
+                let playlists = [];
+                docs.forEach((doc) => {
+                    playlists.push(new SpotifyPlaylist({id: doc.data().id}))
+                });
+                return playlists;
+            });
+    }
+
+    isNew(track) {
+        return this.tracksTable.where("id", "==", track.id).get()
+            .then(docs => docs.size === 0);
+    }
 }
 
 let scheduleService = new StudyScheduleService();
