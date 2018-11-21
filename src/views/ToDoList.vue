@@ -1,5 +1,5 @@
 <template>
-    <div class="to-do-list mdl-list">
+    <div>
         <to-do-list-item v-for="(studyMoment, index) in studyMoments"
                 :key="index"
                 :studymoment="studyMoment"
@@ -32,10 +32,3 @@
         }
     }
 </script>
-
-<style scoped>
-    .to-do-list {
-        max-width: 12em;
-        margin: 0 auto 0 auto
-    }
-</style>

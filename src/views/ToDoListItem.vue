@@ -1,11 +1,10 @@
 <template>
-    <div class="mdl-list__item">
-            <span class="mdl-list__item-primary-content">
-              <!--<i class="material-icons mdl-list__item-avatar">person</i>-->
+    <div>
+            <span>
              {{studymoment.playlist}}
             </span>
         <div v-if="loading">...</div>
-        <a v-else class="mdl-list__item-secondary-action" href="#!" @click.stop.prevent="setDone()"><i class="material-icons">done</i></a>
+        <a v-else href="#!" @click.stop.prevent="setDone()"><i class="material-icons">done</i></a>
     </div>
 </template>
 
@@ -37,9 +36,3 @@
         }
     }
 </script>
-
-<style scoped>
-    .to-do-list {
-        max-width: 12em;
-    }
-</style>
