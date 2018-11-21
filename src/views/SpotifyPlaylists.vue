@@ -14,14 +14,17 @@
         <h1>Tracked playlists</h1>
 
         <a href="#!" @click="findNewSongs">Find new songs</a>
+        <a v-if="newSongs.length > 0" href.stop.prevent="#!" @click="createPlaylist">Create playlist</a>
 
         <ul class="demo-list-item mdl-list">
             <li class="mdl-list__item" v-for="song in newSongs" :key="song.id">
                 <span class="mdl-list__item-primary-content">
-                 {{song.artist}} - {{song.title}}
+                 {{song.artist}} - {{song.title}} ({{song.id}})
                 </span>
             </li>
         </ul>
+
+
     </div>
 </template>
 
@@ -115,6 +118,13 @@
 
                     });
 
+            },
+            createPlaylist(){
+                const self = this;
+                spotifyDataService.createPlaylist("New playlist")
+                    .then((playlistId) => {
+                        spotifyDataService.addTracks(playlistId, self.newSongs)
+                    });
             }
         }
     }
