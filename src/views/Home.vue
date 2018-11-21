@@ -6,7 +6,7 @@
 
         <h1>TO DO</h1>
 
-        <to-do-list/>
+        <to-do-list :study-moments="studyMoments" />
 
         <button @click.stop.prevent="addPlaylist">Add playlist for today</button>
 
@@ -18,6 +18,8 @@
     import {scheduleService} from '../services/StudyScheduleService';
     import ToDoList from "./ToDoList";
     import SpotifyLogin from "./SpotifyLogin";
+    import { mapState } from 'vuex';
+    import store from "../store";
 
     export default {
         name: 'Home',
@@ -25,11 +27,11 @@
         props: {
             msg: String
         },
+        computed: {
+            ...mapState(["studyMoments"])
+        },
         mounted: function () {
-            const self = this;
-            scheduleService.getTodoList().then(it => {
-                self.studyMoments = it;
-            });
+            store.dispatch("loadStudyMoments");
         },
         data: function () {
             return {
@@ -38,12 +40,10 @@
                 playlists: [],
                 spotifyAccessToken: null,
                 spotifyAccessTokenExpiresIn: null,
-                db: null,
-                studyMoments: []
+                db: null
             };
         },
         methods: {
-
             addPlaylist() {
                 scheduleService.create(new Date())
                     .then((playlistName) => alert("Playlist " + playlistName + " added successfully"))

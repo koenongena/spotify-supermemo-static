@@ -8,22 +8,13 @@
 </template>
 
 <script>
-    import {scheduleService} from '../services/StudyScheduleService';
     import ToDoListItem from "./ToDoListItem";
 
     export default {
         name: "ToDoList",
         components: {ToDoListItem},
-        data() {
-            return {
-                studyMoments: []
-            }
-        },
-        mounted: function () {
-            const self = this;
-            scheduleService.getTodoList().then(it => {
-                self.studyMoments = it;
-            });
+        props: {
+            studyMoments: {default: []}
         },
         methods: {
             handleDone(study) {
