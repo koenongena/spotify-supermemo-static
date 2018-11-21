@@ -163,17 +163,14 @@ class StudyScheduleService {
      *
      * @param track {SpotifyTrack}
      */
-    saveTrack(track, playlist) {
-        this.tracksTable.doc(track.id)
+    saveTrack(track) {
+        return this.tracksTable.doc(track.id)
             .set({
                 id: track.id,
                 artist: track.artist,
                 title: track.title,
                 playlist: track.playlist
             });
-
-        this.playlistsTable.doc(playlist.name)
-            .update({scanned: true})
     }
 
     /**
@@ -181,12 +178,12 @@ class StudyScheduleService {
      * @param playlist {SpotifyPlaylist}
      */
     savePlaylist(playlist) {
-        this.playlistsTable.doc(playlist.name)
+        return this.playlistsTable.doc(playlist.name)
             .set({
                 id: playlist.id,
                 name: playlist.name,
                 uri: playlist.uri,
-                scanned: false
+                scanned: playlist.scanned
             })
     }
 

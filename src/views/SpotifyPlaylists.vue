@@ -57,12 +57,16 @@
              * @param playlist {SpotifyPlaylist}
              */
             scan(playlist) {
+                let markPlaylistScanned = function () {
+                    playlist.scanned = true;
+                    return scheduleService.savePlaylist(playlist);
+                }.bind(this);
+
                 let saveTracks = function (tracks) {
-                    for (const track of tracks) {
-                        scheduleService.saveTrack(track, playlist)
-                    }
+                    return Promise.all(tracks.map(track => scheduleService.saveTrack(track)))
+                        .then(() => markPlaylistScanned());
                 };
-                spotifyDataService.getTracks(playlist)
+                return spotifyDataService.getTracks(playlist)
                     .then(tracks => saveTracks(tracks));
             },
             getUnscannedPlaylists() {
