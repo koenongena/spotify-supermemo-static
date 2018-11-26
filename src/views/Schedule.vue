@@ -2,7 +2,7 @@
     <div class="home">
         <h1>Schedule</h1>
 
-        <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
+        <table class="u-full-width">
             <thead>
             <tr>
                 <th>A</th>

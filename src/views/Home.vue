@@ -1,7 +1,5 @@
 <template>
     <div class="home">
-        <h1>Supermemo</h1>
-
         <spotify-login/>
 
         <h1>TO DO</h1>
@@ -15,10 +13,9 @@
 </template>
 
 <script>
-    import {scheduleService} from '../services/StudyScheduleService';
     import ToDoList from "./ToDoList";
     import SpotifyLogin from "./SpotifyLogin";
-    import { mapState } from 'vuex';
+    import {mapState} from 'vuex';
     import store from "../store";
 
     export default {
@@ -45,9 +42,7 @@
         },
         methods: {
             addPlaylist() {
-                scheduleService.create(new Date())
-                    .then((playlistName) => alert("Playlist " + playlistName + " added successfully"))
-                    .catch((error) => self._log.error(error))
+                store.dispatch("addPlaylist");
             },
             /**
              *

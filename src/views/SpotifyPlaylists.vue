@@ -1,10 +1,10 @@
 <template>
     <div class="home">
-        <h1>Spotify playlists</h1>
+        <h1>Playlists</h1>
 
         <spotify-login></spotify-login>
 
-        <a href="#!" @click="getUnscannedPlaylists" class="mdl-button mdl-button--colored">Find unscanned playlists</a>
+        <a href="#!" @click="getUnscannedPlaylists" class="button">Find unscanned playlists</a>
 
         <ul>
             <li v-for="playlist in playlists" :key="playlist.id">{{playlist.name}}
@@ -13,11 +13,12 @@
 
         <h1>Tracked playlists</h1>
 
-        <a href="#!" @click="findNewSongs">Find new songs</a>
-        <a v-if="newSongs.length > 0" href.stop.prevent="#!" @click="createPlaylist">Create playlist</a>
+        <a href="#!" class="button button-primary" @click="findNewSongs">Find new songs</a>
+        &nbsp;
+        <a v-if="newSongs.length > 0" href.stop.prevent="#!" @click="createPlaylist" class="button button-primary">Create playlist</a>
 
-        <ul class="demo-list-item mdl-list">
-            <li class="mdl-list__item" v-for="song in newSongs" :key="song.id">
+        <ul>
+            <li v-for="song in newSongs" :key="song.id">
                 <span class="mdl-list__item-primary-content">
                  {{song.artist}} - {{song.title}} ({{song.id}})
                 </span>
@@ -140,17 +141,4 @@
         margin: 40px 0 0;
     }
 
-    ul {
-        list-style-type: none;
-        padding: 0;
-    }
-
-    li {
-        display: inline-block;
-        margin: 0 10px;
-    }
-
-    a {
-        color: #42b983;
-    }
 </style>

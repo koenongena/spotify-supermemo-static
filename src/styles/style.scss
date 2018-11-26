@@ -19,27 +19,32 @@ html, body {
   background-color: aliceblue;
   margin: 0;
 }
+html {
+  height: 100%;
+}
 
 #app {
   display: grid;
-  grid-template-rows: 5rem 1fr;
-  grid-template-columns: 12rem 1fr;
+  grid-template-rows: 8rem 1fr;
+  grid-template-columns: 16rem 1fr;
   min-height: 100%;
 }
 header {
-  padding: 0 2rem;
+  padding: 1rem 2rem;
   grid-column: 2 span;
-  border-bottom: 3px solid #cb8c29;
+  background-color: rgb(32, 33, 36);
+  box-shadow: rgba(0, 0, 0, 0.5) 0px 2px 4px 0px;
+  color: white;
 }
 aside {
   padding: 1rem;
-  background-color: black;
   display: flex;
   flex-direction: column;
   height: 100%;
 
+  border-right: 1px solid grey;
   a {
-    color: whitesmoke;
+    color: gray;
     padding: 0.5rem 1rem;
     text-decoration: none;
   }

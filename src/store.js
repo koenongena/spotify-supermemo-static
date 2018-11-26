@@ -37,6 +37,12 @@ export default new Vuex.Store({
                 context.commit(Mutations.STUDYMOMENTS, studyMoments);
             });
         },
+
+        addPlaylist() {
+            scheduleService.create(new Date())
+                .then((playlistName) => alert("Playlist " + playlistName + " added successfully"))
+                .catch((error) => self._log.error(error))
+        },
         loadSpotifyAccessToken(context) {
             let spotifyAccessToken = localStorage.getItem('sp-accessToken');
             if (spotifyAccessToken) {
