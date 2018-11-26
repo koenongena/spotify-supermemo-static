@@ -3,7 +3,7 @@
 </template>
 
 <script>
-    import moment from 'moment';
+    import store from "../store";
 
     export default {
         name: "SpotifyCallback",
@@ -21,11 +21,8 @@
             };
 
             let hashParams = getHashParams();
-            localStorage.setItem("sp-accessToken", hashParams['access_token']);
-            localStorage.setItem("sp-accessTokenType", hashParams['token_type']);
-            localStorage.setItem("sp-accessTokenExpiresIn", hashParams['expires_in']);
-            localStorage.setItem("sp-accessTokenExpiration", moment(Date.now()).add(hashParams['expires_in'], 'seconds').toDate());
 
+            store.dispatch('registerSpotifyLoginCallback', hashParams);
             setTimeout(() => window.close(), 1000);
         }
     }

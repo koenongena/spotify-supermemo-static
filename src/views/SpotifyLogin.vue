@@ -9,25 +9,23 @@
 </template>
 
 <script>
+    import { mapState } from 'vuex';
+    import store from "../store";
 
     export default {
         name: 'SpotifyLogin',
         props: {
             msg: String
         },
+        computed: {
+            ...mapState(["spotifyAccessToken"])
+        },
         mounted: function () {
-            this.spotifyAccessToken = localStorage.getItem('sp-accessToken');
-            if (this.spotifyAccessToken) {
-                let expirationDate = Date.parse(localStorage.getItem("sp-accessTokenExpiration"));
-                if (!expirationDate || expirationDate < new Date()) {
-                    this.spotifyAccessToken = null;
-                    localStorage.setItem('sp-accessToken', null)
-                }
-            }
+            store.dispatch("loadSpotifyAccessToken");
+
         },
         data: function () {
             return {
-                spotifyAccessToken: null,
                 spotifyAccessTokenExpiresIn: null
             };
         },
@@ -55,10 +53,8 @@
                     'menubar=no,location=no,resizable=no,scrollbars=no,status=no, width=' + width + ', height=' + height + ', top=' + top + ', left=' + left
                 );
 
-                var self = this;
                 spotifyLoginWindow.onbeforeunload = function () {
-                    self.spotifyAccessToken = localStorage.getItem('sp-accessToken');
-                    self.spotifyAccessTokenExpiresIn = localStorage.getItem('sp-accessTokenExpiresIn');
+                    store.dispatch('registerSpotifyToken');
                 };
 
 
