@@ -16,6 +16,7 @@ export default new Vuex.Store({
     mutations: {
         [Mutations.STUDYMOMENTS](state, studyMoments) {
             state.studyMoments = studyMoments;
+            state.studyMoments.sort((a, b) => a.playlist < b.playlist);
         }
     },
     actions: {
