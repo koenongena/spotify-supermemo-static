@@ -24,6 +24,12 @@ export default new Vuex.Store({
                 context.commit(Mutations.STUDYMOMENTS, studyMoments);
             });
 
+        },
+        setPlaylistDone(context, study) {
+            scheduleService.setDone(study).then(() => {
+                let studyMoments = context.state.studyMoments.filter(sm => sm.id !== study.id);
+                context.commit(Mutations.STUDYMOMENTS, studyMoments);
+            });
         }
     }
 })

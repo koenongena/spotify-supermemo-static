@@ -1,5 +1,8 @@
 <template>
     <div id="app">
+        <header>
+            <h1>Supermemo - spotify</h1>
+        </header>
         <aside>
             <router-link to="/home">Home</router-link>
             <router-link to="/schedule">Schedule</router-link>

@@ -22,18 +22,24 @@ html, body {
 
 #app {
   display: grid;
+  grid-template-rows: 5rem 1fr;
   grid-template-columns: 12rem 1fr;
   min-height: 100%;
 }
-
+header {
+  padding: 0 2rem;
+  grid-column: 2 span;
+  border-bottom: 3px solid #cb8c29;
+}
 aside {
   padding: 1rem;
-  background-color: #f2f2f2;
+  background-color: black;
   display: flex;
   flex-direction: column;
   height: 100%;
 
   a {
+    color: whitesmoke;
     padding: 0.5rem 1rem;
     text-decoration: none;
   }

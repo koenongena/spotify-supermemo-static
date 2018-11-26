@@ -54,12 +54,7 @@
              * @param study {Study}
              */
             setDone(study) {
-                const doneHandler = function () {
-                    this.studyMoments = this.studyMoments.filter(sm => sm.id !== study.id);
-                }.bind(this);
-
-                scheduleService.setDone(study)
-                    .then(() => doneHandler());
+                store.dispatch("setPlaylistDone", study);
             }
         }
     }
