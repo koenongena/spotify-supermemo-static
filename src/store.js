@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import moment from 'moment';
 import {scheduleService} from "./services/StudyScheduleService";
+import {spotifyDataService} from "./services/SpotifyService";
 
 Vue.use(Vuex);
 
@@ -13,7 +14,9 @@ const Mutations = {
 export default new Vuex.Store({
     state: {
         studyMoments: [],
-        spotifyAccessToken: null
+        spotifyAccessToken: null,
+        unscannedPlaylists: [],
+        newSongs: []
     },
     mutations: {
         [Mutations.STUDYMOMENTS](state, studyMoments) {
@@ -22,6 +25,7 @@ export default new Vuex.Store({
         },
         [Mutations.SPOTIFY_ACCESS](state, accessToken) {
             state.spotifyAccessToken = accessToken;
+            spotifyDataService.updateToken(accessToken);
         }
     },
     actions: {
@@ -60,13 +64,79 @@ export default new Vuex.Store({
             //let expiration = localStorage.getItem('sp-accessTokenExpiresIn');
             context.commit(Mutations.SPOTIFY_ACCESS, accessToken);
         },
-        registerSpotifyLoginCallback(context, hashParams){
+        registerSpotifyLoginCallback(context, hashParams) {
             context.commit(Mutations.SPOTIFY_ACCESS, hashParams['access_token']);
 
             localStorage.setItem("sp-accessToken", hashParams['access_token']);
             localStorage.setItem("sp-accessTokenType", hashParams['token_type']);
             localStorage.setItem("sp-accessTokenExpiresIn", hashParams['expires_in']);
             localStorage.setItem("sp-accessTokenExpiration", moment(Date.now()).add(hashParams['expires_in'], 'seconds').toDate());
+        },
+        fetchUnscannedPlaylists(context) {
+            context.state.unscannedPlaylists = [];
+
+            let _isSupermemoPlaylist = function (pl) {
+                return new RegExp("^\\d{4}-\\d{2}-\\d{2}$").test(pl.name);
+
+            };
+
+            let addIfUnscanned = function (pl) {
+                scheduleService.getPlaylistsWithName(pl.name)
+                    .then(playlist => {
+                        if (!playlist.scanned) {
+                            // playlists.push(pl);
+                            context.state.unscannedPlaylists.push(pl);
+                        }
+                    });
+            };
+
+            let addPlaylists = function (playlists) {
+                for (const playlist of playlists) {
+                    if (_isSupermemoPlaylist(playlist)) {
+                        addIfUnscanned(playlist);
+                    }
+                }
+            };
+
+            spotifyDataService
+                .fetchPlaylists()
+                .then(playlists => addPlaylists(playlists));
+        },
+        findNewSongs(context) {
+            context.state.newSongs = [];
+            scheduleService.getTrackedPlaylists()
+                .then((playlists) => {
+                    for (const playlist of playlists) {
+                        spotifyDataService.getTracks(playlist)
+                            .then(tracks => {
+                                for (const track of tracks) {
+                                    scheduleService.isNew(track).then(b => {
+                                        if (b) context.state.newSongs.push(track)
+                                    })
+                                }
+                            });
+                    }
+
+                });
+        },
+        scanPlaylist(context, playlist) {
+            let markPlaylistScanned = function () {
+                playlist.scanned = true;
+                return scheduleService.savePlaylist(playlist);
+            }.bind(this);
+
+            let saveTracks = function (tracks) {
+                return Promise.all(tracks.map(track => scheduleService.saveTrack(track)))
+                    .then(() => markPlaylistScanned());
+            };
+            return spotifyDataService.getTracks(playlist)
+                .then(tracks => saveTracks(tracks));
+        },
+        createPlaylistFromNewSongs(context) {
+            spotifyDataService.createPlaylist("New playlist")
+                .then((playlistId) => {
+                    spotifyDataService.addTracks(playlistId, context.state.newSongs)
+                });
         }
     }
 })

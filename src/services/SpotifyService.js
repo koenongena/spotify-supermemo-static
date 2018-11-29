@@ -5,10 +5,7 @@ import SpotifyTrack from "../model/SpotifyTrack";
 class SpotifyService {
 
     constructor() {
-        this.spotifyAccessToken = localStorage.getItem('sp-accessToken');
-        this.headers = {
-            'Authorization': "Bearer " + localStorage.getItem('sp-accessToken')
-        };
+        this.updateToken(localStorage.getItem('sp-accessToken'));
         const self = this;
         this.userId = "";
         axios.get("https://api.spotify.com/v1/me", {headers: self.headers})
@@ -84,6 +81,12 @@ class SpotifyService {
         }
     }
 
+    updateToken(accessToken) {
+        this.spotifyAccessToken = accessToken;
+        this.headers = {
+            'Authorization': "Bearer " + accessToken
+        };
+    }
 }
 
 let spotifyDataService = new SpotifyService();
