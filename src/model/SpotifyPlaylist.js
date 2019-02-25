@@ -5,5 +5,6 @@ export default class SpotifyPlaylist {
         this.tracks = json.tracks;
         this.scanned = json.scanned;
         this.uri = json.uri;
+        this.weight = json.weight || 0;
     }
 }

@@ -15,12 +15,13 @@
 
         <a href="#!" class="button button-primary" @click="findNewSongs">Find new songs</a>
         &nbsp;
-        <a v-if="newSongs.length > 0" href.stop.prevent="#!" @click="createPlaylist" class="button button-primary">Create playlist</a>
+        <!--<a v-if="newSongs.length > 0" href.stop.prevent="#!" @click="createPlaylist" class="button button-primary">Create playlist</a>-->
+        <a v-if="newSongs.length > 0" href.stop.prevent="#!" @click="addToBuffer" class="button button-primary">Add to buffer</a>
 
         <ul>
             <li v-for="song in newSongs" :key="song.id">
                 <span class="mdl-list__item-primary-content">
-                 {{song.artist}} - {{song.title}} ({{song.id}})
+                 {{song.artist}} - {{song.title}} ({{song.id}}) (weight: {{song.weight}}
                 </span>
             </li>
         </ul>
@@ -62,6 +63,9 @@
             },
             createPlaylist(){
                 store.dispatch("createPlaylistFromNewSongs");
+            },
+            addToBuffer(){
+                store.dispatch("addToBuffer");
             }
         }
     }

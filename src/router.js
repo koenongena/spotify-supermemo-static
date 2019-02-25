@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Home from './views/Home.vue'
 import Import from './views/Import.vue'
 import Login from './views/Login.vue';
+import Buffer from './views/Buffer.vue';
 import Schedule from './views/Schedule.vue';
 import SpotifyCallback from './views/SpotifyCallback.vue';
 import SpotifyPlaylists from './views/SpotifyPlaylists.vue';
@@ -64,6 +65,11 @@ let router = new Router({
             // this generates a separate chunk (about.[hash].js) for this route
             // which is lazy-loaded when the route is visited.
             component: () => import(/* webpackChunkName: "about" */ './views/About.vue')
+        },
+        {
+            path: '/buffer',
+            name: 'buffer',
+            component: Buffer
         }
     ]
 });

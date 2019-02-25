@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 import moment from 'moment';
 import {scheduleService} from "./services/StudyScheduleService";
 import {spotifyDataService} from "./services/SpotifyService";
+import {bufferService} from "./services/BufferService";
 
 Vue.use(Vuex);
 
@@ -16,7 +17,7 @@ export default new Vuex.Store({
         studyMoments: [],
         spotifyAccessToken: null,
         unscannedPlaylists: [],
-        newSongs: []
+        newSongs: new Set()
     },
     mutations: {
         [Mutations.STUDYMOMENTS](state, studyMoments) {
@@ -104,16 +105,33 @@ export default new Vuex.Store({
         },
         findNewSongs(context) {
             context.state.newSongs = [];
+
+            function handleNEwTrack(track) {
+                let existingTrack = context.state.newSongs.find((s) => s.id === track.id);
+                if (existingTrack) {
+                    if (existingTrack.weight < track.weight)
+                        existingTrack.weight = track.weight;
+                } else {
+                    context.state.newSongs.push(track);
+                }
+            }
+
+            function investigateTracks(tracks) {
+                for (const track of tracks) {
+                    scheduleService.isNew(track).then(b => {
+                        if (b) {
+                            handleNEwTrack(track);
+                        }
+                    })
+                }
+            }
+
             scheduleService.getTrackedPlaylists()
                 .then((playlists) => {
                     for (const playlist of playlists) {
                         spotifyDataService.getTracks(playlist)
                             .then(tracks => {
-                                for (const track of tracks) {
-                                    scheduleService.isNew(track).then(b => {
-                                        if (b) context.state.newSongs.push(track)
-                                    })
-                                }
+                                investigateTracks(tracks);
                             });
                     }
 
@@ -136,6 +154,12 @@ export default new Vuex.Store({
             spotifyDataService.createPlaylist("New playlist")
                 .then((playlistId) => {
                     spotifyDataService.addTracks(playlistId, context.state.newSongs)
+                });
+        },
+        addToBuffer(context) {
+            bufferService.addToBuffer(context.state.newSongs)
+                .then(() => {
+                    context.state.newSongs = [];
                 });
         }
     }

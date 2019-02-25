@@ -130,6 +130,9 @@ class StudyScheduleService {
     get tracksTable() {
         return this.db.collection("tracks");
     }
+    get bufferTable() {
+        return this.db.collection("buffer");
+    }
 
     get playlistsTable() {
         return this.db.collection("playlists");
@@ -204,15 +207,18 @@ class StudyScheduleService {
             .then((docs) => {
                 let playlists = [];
                 docs.forEach((doc) => {
-                    playlists.push(new SpotifyPlaylist({id: doc.data().id}))
+                    playlists.push(new SpotifyPlaylist({id: doc.data().id, name: doc.data().name, weight: doc.data().weight}))
                 });
                 return playlists;
             });
     }
 
     isNew(track) {
-        return this.tracksTable.where("id", "==", track.id).get()
-            .then(docs => docs.size === 0);
+        const studiedTrack = this.tracksTable.where("id", "==", track.id).get();
+        const bufferedTrack = this.bufferTable.where("id", "==", track.id).get();
+
+        return Promise.all([studiedTrack, bufferedTrack])
+            .then((values) => values.every(docs => docs.size === 0));
     }
 
     /**
