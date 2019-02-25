@@ -55,7 +55,7 @@
 
             },
             pop5: function () {
-                this.addSongsToSPotify(1);
+                this.addSongsToSPotify(5);
             }
         }
 
