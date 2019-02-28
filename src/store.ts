@@ -4,6 +4,7 @@ import moment from 'moment';
 import {scheduleService} from "./services/StudyScheduleService";
 import {spotifyDataService} from "./services/SpotifyService";
 import {bufferService} from "./services/BufferService";
+import {Playlist} from "@/model/Playlist";
 
 Vue.use(Vuex);
 
@@ -91,7 +92,7 @@ export default new Vuex.Store({
                     });
             };
 
-            let addPlaylists = function (playlists) {
+            let addPlaylists = function (playlists:Playlist[]) {
                 for (const playlist of playlists) {
                     if (_isSupermemoPlaylist(playlist)) {
                         addIfUnscanned(playlist);

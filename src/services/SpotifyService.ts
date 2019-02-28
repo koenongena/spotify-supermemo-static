@@ -1,13 +1,17 @@
-import axios from 'axios';
+import axios, {AxiosResponse} from 'axios';
 import SpotifyPlaylist from "../model/SpotifyPlaylist";
 import SpotifyTrack from "../model/SpotifyTrack";
 
 class SpotifyService {
+    private spotifyAccessToken?: string | null;
+    private userId: string;
+    private headers: any;
 
     constructor() {
         this.updateToken(localStorage.getItem('sp-accessToken'));
         const self = this;
         this.userId = "";
+
         axios.get("https://api.spotify.com/v1/me", {headers: self.headers})
             .then(response => {
                 self.userId = response.data.id;
@@ -15,14 +19,14 @@ class SpotifyService {
     }
 
     fetchPlaylists() {
-        let responses = [];
+        let responses: AxiosResponse<any>[] = [];
         return this._fetch("https://api.spotify.com/v1/me/playlists", responses)
             .then(() => {
-                return responses.flatMap(response => response.data.items.map(it => new SpotifyPlaylist(it)));
+                return responses.flatMap(response => response.data.items.map((it: any) => new SpotifyPlaylist(it)));
             });
     }
 
-    _fetch(url, responses) {
+    _fetch(url: string, responses: AxiosResponse[]) {
         const self = this;
         return new Promise((resolve) => {
             axios.get(url, {headers: self.headers})
@@ -37,17 +41,12 @@ class SpotifyService {
         });
     }
 
-    /**
-     *
-     * @param playlist {SpotifyPlaylist}
-     * @returns {Promise<AxiosResponse<any> | never>}
-     */
-    getTracks(playlist) {
-        let responses = [];
+    getTracks(playlist: SpotifyPlaylist) {
+        let responses: AxiosResponse[] = [];
         let url = "https://api.spotify.com/v1/playlists/" + playlist.id + "/tracks ";
         return this._fetch(url, responses)
             .then(() => {
-                return responses.flatMap(response => response.data.items.map(json => new SpotifyTrack(
+                return responses.flatMap(response => response.data.items.map((json: any) => new SpotifyTrack(
                     json.track.id,
                     playlist.name,
                     json.track.artists[0].name,
@@ -58,7 +57,7 @@ class SpotifyService {
             });
     }
 
-    createPlaylist(name) {
+    createPlaylist(name: string) {
         if (this.userId === null) {
             alert("No spotify user id");
         }
@@ -73,7 +72,7 @@ class SpotifyService {
      * @param songs {Array} of {SpotifyTrack}
      * @return {Promise<any>}
      */
-    addTracks(playlistId, songs) {
+    addTracks(playlistId: string, songs: SpotifyTrack[]): Promise<any> {
         const self = this;
         if (songs.length === 0) {
             return new Promise((resolve) => resolve());
@@ -88,7 +87,7 @@ class SpotifyService {
         }
     }
 
-    updateToken(accessToken) {
+    updateToken(accessToken: string | null) {
         this.spotifyAccessToken = accessToken;
         this.headers = {
             'Authorization': "Bearer " + accessToken
