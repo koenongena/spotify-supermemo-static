@@ -53,3 +53,15 @@ aside {
 main {
   padding: 1rem;
 }
+
+.material-icons {
+  &.md-48 {
+    font-size: 48px;
+
+  }
+
+  &.md-36{
+    font-size: 36px;
+
+  }
+}
