@@ -1,8 +1,8 @@
 import moment from 'moment';
 import {Playlist} from "@/model/Playlist";
 
-Date.prototype.addDays = function (days) {
-    var date = new Date(this.valueOf());
+const addDays = function (date:Date, days:number) {
+    var date = new Date(date.valueOf());
     date.setDate(date.getDate() + days);
     return date;
 };
@@ -10,6 +10,8 @@ Date.prototype.addDays = function (days) {
 export default class Schedule {
     playlists: Playlist[];
     days: any[];
+    minDay: Date;
+    maxDay: Date;
     /**
      *
      * @param playlists {Array.<Playlist>>}
@@ -34,13 +36,22 @@ export default class Schedule {
         }
         let days = [];
         let day = this.minDay;
-        let dayAfterLastDay = this.maxDay.addDays(1);
+        let dayAfterLastDay = addDays(this.maxDay, 1);
+
+        class StudyDay {
+            date: Date;
+            playlists: any[];
+
+
+            constructor(date: Date, playlists: any[]) {
+                this.date = date;
+                this.playlists = playlists;
+            }
+        }
+
         while (day.getTime() < dayAfterLastDay.getTime()) {
-            days.push({
-                date: day,
-                playlists: [null,null,null,null,null,null,null]
-            });
-            day = day.addDays(1);
+            days.push(new StudyDay(day, [null, null, null, null, null, null, null]));
+            day = addDays(day, 1);
         }
 
         for (let i = 0; i < this.playlists.length; i++) {
@@ -63,8 +74,8 @@ export default class Schedule {
      * @return time {*|moment.Moment}
      * @private
      */
-    static _findEarliestStudytime(playlists) {
-        const compare = function (studyMoment, min) {
+    static _findEarliestStudytime(playlists:Playlist[]) {
+        const compare = function (studyMoment:Date, min:Date) {
             return studyMoment.getTime() < min.getTime();
         };
 
@@ -72,7 +83,7 @@ export default class Schedule {
     }
 
 
-    static _find(playlists, compare, start = new Date()) {
+    static _find(playlists:Playlist[], compare: (studyMoment:Date, m:Date) => boolean, start = new Date()) {
         let m = start;
         for (let i = 0; i < playlists.length; i++) {
             let studyMoments = playlists[i].studyMoments;
@@ -87,11 +98,11 @@ export default class Schedule {
         return m;
     }
 
-    static _findLastStudytime(playlists) {
-        const compare = function (studyMoment, current) {
+    static _findLastStudytime(playlists:Playlist[]) {
+        const compare = function (studyMoment:Date, current:Date) {
             return moment(studyMoment).isAfter(moment(current));
         };
 
-        return Schedule._find(playlists, compare, moment('1990-01-01'));
+        return Schedule._find(playlists, compare, moment('1990-01-01').toDate());
     }
 }

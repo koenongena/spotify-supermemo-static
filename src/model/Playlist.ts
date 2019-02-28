@@ -1,7 +1,10 @@
 class Playlist {
-    constructor(data){
+    readonly name: string;
+    studyMoments: StudyMoment[];
+
+    constructor(data:any){
         this.name = data.name;
-        this.studyMoments = data.studyMoments.map(it => new StudyMoment(it.time, it.done));
+        this.studyMoments = data.studyMoments.map((it:any) => new StudyMoment(it.time, it.done));
     }
 
     getFirstStudyMoment(){
@@ -10,7 +13,10 @@ class Playlist {
 }
 
 class StudyMoment {
-    constructor(time, done) {
+    time: Date;
+    done: boolean;
+
+    constructor(time:any, done:boolean) {
         this.time = new Date(time.toMillis());
         this.done = done;
     }
