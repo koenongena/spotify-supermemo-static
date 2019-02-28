@@ -57,7 +57,6 @@ export default new Vuex.Store({
         addPlaylist() {
             scheduleService.create(new Date())
                 .then((playlistName) => alert("Playlist " + playlistName + " added successfully"))
-                .catch((error:any) => console.log(error))
         },
         loadSpotifyAccessToken(context) {
             let spotifyAccessToken = localStorage.getItem('sp-accessToken');

@@ -1,18 +1,56 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
-  </div>
+    <div class="home">
+        <spotify-login/>
+
+        <h1>TO DO</h1>
+
+        <to-do-list :study-moments="studyMoments" />
+
+        <button @click.stop.prevent="addPlaylist">Add playlist for today</button>
+
+        <p>{{ error }}</p>
+    </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
+<script>
+    import ToDoList from "./ToDoList";
+    import SpotifyLogin from "./SpotifyLogin";
+    import {mapState} from 'vuex';
+    import store from "../store";
 
-@Component({
-  components: {
-    HelloWorld,
-  },
-})
-export default class Home extends Vue {}
+    export default {
+        name: 'Home',
+        components: {SpotifyLogin, ToDoList},
+        props: {
+            msg: String
+        },
+        computed: {
+            ...mapState(["studyMoments"])
+        },
+        mounted: function () {
+            store.dispatch("loadStudyMoments");
+        },
+        data: function () {
+            return {
+                user: null,
+                error: "",
+                playlists: [],
+                spotifyAccessToken: null,
+                spotifyAccessTokenExpiresIn: null,
+                db: null
+            };
+        },
+        methods: {
+            addPlaylist() {
+                store.dispatch("addPlaylist");
+            },
+            /**
+             *
+             * @param study {Study}
+             */
+            setDone(study) {
+                store.dispatch("setPlaylistDone", study);
+            }
+        }
+    }
 </script>

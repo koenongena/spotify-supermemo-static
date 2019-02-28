@@ -7,7 +7,7 @@
         </div>
         <p v-if="loading">Loading...</p>
         <ul>
-            <li v-for="song in songs">
+            <li v-for="song in songs" v-bind:key="song.id">
                 {{song.artist}} - {{song.title}} ({{song.weight}})
             </li>
         </ul>
