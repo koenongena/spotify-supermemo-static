@@ -6,6 +6,7 @@ import {spotifyDataService} from "./services/SpotifyService";
 import {bufferService} from "./services/BufferService";
 import {Playlist, StudyMoment} from "@/model/Playlist";
 import SpotifyTrack from "@/model/SpotifyTrack";
+import SpotifyPlaylist from "@/model/SpotifyPlaylist";
 
 Vue.use(Vuex);
 
@@ -17,7 +18,7 @@ const Mutations = {
 interface MyState {
     studyMoments: StudyMoment[];
     spotifyAccessToken: string | null;
-    unscannedPlaylists: Playlist[];
+    unscannedPlaylists: SpotifyPlaylist[];
     newSongs: SpotifyTrack[];
     loading: boolean;
     loadingMessage:string;
@@ -91,12 +92,12 @@ export default new Vuex.Store({
         fetchUnscannedPlaylists(context) {
             context.state.unscannedPlaylists = [];
 
-            let _isSupermemoPlaylist = function (pl: Playlist) {
+            let _isSupermemoPlaylist = function (pl: SpotifyPlaylist) {
                 return new RegExp("^\\d{4}-\\d{2}-\\d{2}$").test(pl.name);
 
             };
 
-            let addIfUnscanned = function (pl: Playlist) {
+            let addIfUnscanned = function (pl: SpotifyPlaylist) {
                 scheduleService.getPlaylistsWithName(pl.name)
                     .then(playlist => {
                         if (!playlist.scanned) {
@@ -106,7 +107,7 @@ export default new Vuex.Store({
                     });
             };
 
-            let addPlaylists = function (playlists: Playlist[]) {
+            let addPlaylists = function (playlists: SpotifyPlaylist[]) {
                 for (const playlist of playlists) {
                     if (_isSupermemoPlaylist(playlist)) {
                         addIfUnscanned(playlist);
@@ -114,9 +115,15 @@ export default new Vuex.Store({
                 }
             };
 
+            context.state.loading = true;
+            context.state.loadingMessage = "Fetching playlists";
             spotifyDataService
                 .fetchPlaylists()
-                .then(playlists => addPlaylists(playlists));
+                .then(playlists => {
+                    context.state.loadingMessage = `Found ${playlists.map((p) => p.name)}`;
+                    addPlaylists(playlists)
+
+                });
         },
         async findNewSongs(context) {
             context.state.newSongs = [];

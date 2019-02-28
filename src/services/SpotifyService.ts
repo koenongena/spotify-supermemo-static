@@ -18,12 +18,17 @@ class SpotifyService {
             })
     }
 
-    fetchPlaylists() {
-        let responses: AxiosResponse<any>[] = [];
-        return this._fetch("https://api.spotify.com/v1/me/playlists", responses)
-            .then(() => {
-                return responses.flatMap(response => response.data.items.map((it: any) => new SpotifyPlaylist(it)));
-            });
+    async fetchPlaylists(url: string = "https://api.spotify.com/v1/me/playlists"):Promise<SpotifyPlaylist[]> {
+        const self = this;
+        let firstPlaylistts = await axios.get(url, {headers: self.headers});
+        let playlists = firstPlaylistts.data.items.map((it: any) => new SpotifyPlaylist(it));
+
+        if (firstPlaylistts.data.next) {
+            let nextPlaylists = await this.fetchPlaylists(firstPlaylistts.data.next);
+            return playlists.concat(nextPlaylists)
+        }
+
+        return playlists;
     }
 
     _fetch(url: string, responses: AxiosResponse[]) {

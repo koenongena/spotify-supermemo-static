@@ -6,10 +6,6 @@ class Playlist {
         this.name = data.name;
         this.studyMoments = data.studyMoments.map((it:any) => new StudyMoment(it.time, it.done));
     }
-
-    getFirstStudyMoment(){
-        return this.studyMoments[0]
-    }
 }
 
 class StudyMoment {
