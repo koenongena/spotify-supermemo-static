@@ -4,7 +4,7 @@ export default class SpotifyTrack {
     readonly artist: string;
     readonly title: string;
     readonly uri: string;
-    readonly weight: number;
+    weight: number;
 
     constructor(id:string, playlist:string = "?", artist:string, title:string, uri = '', weight = 0) {
         this.id = id;

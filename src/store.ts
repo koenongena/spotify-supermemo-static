@@ -4,7 +4,8 @@ import moment from 'moment';
 import {scheduleService} from "./services/StudyScheduleService";
 import {spotifyDataService} from "./services/SpotifyService";
 import {bufferService} from "./services/BufferService";
-import {Playlist} from "@/model/Playlist";
+import {Playlist, StudyMoment} from "@/model/Playlist";
+import SpotifyTrack from "@/model/SpotifyTrack";
 
 Vue.use(Vuex);
 
@@ -13,17 +14,26 @@ const Mutations = {
     SPOTIFY_ACCESS: 'SPOTIFY_ACCESS'
 };
 
+interface MyState {
+    studyMoments: StudyMoment[];
+    spotifyAccessToken: string|null;
+    unscannedPlaylists: Playlist[];
+    newSongs: SpotifyTrack[];
+}
+
+const state: MyState = {
+    studyMoments: [],
+    spotifyAccessToken: null,
+    unscannedPlaylists: [],
+    newSongs: []
+};
+
 export default new Vuex.Store({
-    state: {
-        studyMoments: [],
-        spotifyAccessToken: null,
-        unscannedPlaylists: [],
-        newSongs: new Set()
-    },
+    state: state,
     mutations: {
         [Mutations.STUDYMOMENTS](state, studyMoments) {
             state.studyMoments = studyMoments;
-            state.studyMoments.sort((a, b) => a.playlist < b.playlist);
+            state.studyMoments.sort();
         },
         [Mutations.SPOTIFY_ACCESS](state, accessToken) {
             state.spotifyAccessToken = accessToken;
@@ -39,7 +49,7 @@ export default new Vuex.Store({
         },
         setPlaylistDone(context, study) {
             scheduleService.setDone(study).then(() => {
-                let studyMoments = context.state.studyMoments.filter(sm => sm.id !== study.id);
+                let studyMoments = context.state.studyMoments.filter((sm:any) => sm.id !== study.id);
                 context.commit(Mutations.STUDYMOMENTS, studyMoments);
             });
         },
@@ -47,15 +57,15 @@ export default new Vuex.Store({
         addPlaylist() {
             scheduleService.create(new Date())
                 .then((playlistName) => alert("Playlist " + playlistName + " added successfully"))
-                .catch((error) => self._log.error(error))
+                .catch((error:any) => console.log(error))
         },
         loadSpotifyAccessToken(context) {
             let spotifyAccessToken = localStorage.getItem('sp-accessToken');
             if (spotifyAccessToken) {
-                let expirationDate = Date.parse(localStorage.getItem("sp-accessTokenExpiration"));
-                if (!expirationDate || expirationDate < new Date()) {
+                let expirationDate = Date.parse(localStorage.getItem("sp-accessTokenExpiration")!!);
+                if (!expirationDate || new Date(expirationDate) < new Date()) {
                     context.commit(Mutations.SPOTIFY_ACCESS, null);
-                    localStorage.setItem('sp-accessToken', null)
+                    localStorage.setItem('sp-accessToken', "")
                 } else {
                     context.commit(Mutations.SPOTIFY_ACCESS, spotifyAccessToken);
                 }
@@ -72,17 +82,17 @@ export default new Vuex.Store({
             localStorage.setItem("sp-accessToken", hashParams['access_token']);
             localStorage.setItem("sp-accessTokenType", hashParams['token_type']);
             localStorage.setItem("sp-accessTokenExpiresIn", hashParams['expires_in']);
-            localStorage.setItem("sp-accessTokenExpiration", moment(Date.now()).add(hashParams['expires_in'], 'seconds').toDate());
+            localStorage.setItem("sp-accessTokenExpiration", moment(Date.now()).add(hashParams['expires_in'], 'seconds').toDate().toISOString());
         },
         fetchUnscannedPlaylists(context) {
             context.state.unscannedPlaylists = [];
 
-            let _isSupermemoPlaylist = function (pl) {
+            let _isSupermemoPlaylist = function (pl:Playlist) {
                 return new RegExp("^\\d{4}-\\d{2}-\\d{2}$").test(pl.name);
 
             };
 
-            let addIfUnscanned = function (pl) {
+            let addIfUnscanned = function (pl:Playlist) {
                 scheduleService.getPlaylistsWithName(pl.name)
                     .then(playlist => {
                         if (!playlist.scanned) {
@@ -107,7 +117,7 @@ export default new Vuex.Store({
         findNewSongs(context) {
             context.state.newSongs = [];
 
-            function handleNEwTrack(track) {
+            function handleNEwTrack(track:SpotifyTrack) {
                 let existingTrack = context.state.newSongs.find((s) => s.id === track.id);
                 if (existingTrack) {
                     if (existingTrack.weight < track.weight)
@@ -117,7 +127,7 @@ export default new Vuex.Store({
                 }
             }
 
-            function investigateTracks(tracks) {
+            function investigateTracks(tracks:SpotifyTrack[]) {
                 for (const track of tracks) {
                     scheduleService.isNew(track).then(b => {
                         if (b) {
@@ -144,7 +154,7 @@ export default new Vuex.Store({
                 return scheduleService.savePlaylist(playlist);
             }.bind(this);
 
-            let saveTracks = function (tracks) {
+            let saveTracks = function (tracks:SpotifyTrack[]) {
                 return Promise.all(tracks.map(track => scheduleService.saveTrack(track)))
                     .then(() => markPlaylistScanned());
             };
