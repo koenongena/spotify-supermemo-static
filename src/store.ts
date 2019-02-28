@@ -116,12 +116,13 @@ export default new Vuex.Store({
             };
 
             context.state.loading = true;
-            context.state.loadingMessage = "Fetching playlists";
+            context.state.loadingMessage = "Scanning playlists";
             spotifyDataService
                 .fetchPlaylists()
-                .then(playlists => {
+                .then(async playlists => {
                     context.state.loadingMessage = `Found ${playlists.map((p) => p.name)}`;
-                    addPlaylists(playlists)
+                    await addPlaylists(playlists);
+                    context.state.loading = false;
 
                 });
         },
