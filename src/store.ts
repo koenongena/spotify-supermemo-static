@@ -16,16 +16,21 @@ const Mutations = {
 
 interface MyState {
     studyMoments: StudyMoment[];
-    spotifyAccessToken: string|null;
+    spotifyAccessToken: string | null;
     unscannedPlaylists: Playlist[];
     newSongs: SpotifyTrack[];
+    loading: boolean;
+    loadingMessage:string;
 }
 
 const state: MyState = {
     studyMoments: [],
     spotifyAccessToken: null,
     unscannedPlaylists: [],
-    newSongs: []
+    newSongs: [],
+    loading: false,
+    loadingMessage: ""
+
 };
 
 export default new Vuex.Store({
@@ -49,7 +54,7 @@ export default new Vuex.Store({
         },
         setPlaylistDone(context, study) {
             scheduleService.setDone(study).then(() => {
-                let studyMoments = context.state.studyMoments.filter((sm:any) => sm.id !== study.id);
+                let studyMoments = context.state.studyMoments.filter((sm: any) => sm.id !== study.id);
                 context.commit(Mutations.STUDYMOMENTS, studyMoments);
             });
         },
@@ -86,12 +91,12 @@ export default new Vuex.Store({
         fetchUnscannedPlaylists(context) {
             context.state.unscannedPlaylists = [];
 
-            let _isSupermemoPlaylist = function (pl:Playlist) {
+            let _isSupermemoPlaylist = function (pl: Playlist) {
                 return new RegExp("^\\d{4}-\\d{2}-\\d{2}$").test(pl.name);
 
             };
 
-            let addIfUnscanned = function (pl:Playlist) {
+            let addIfUnscanned = function (pl: Playlist) {
                 scheduleService.getPlaylistsWithName(pl.name)
                     .then(playlist => {
                         if (!playlist.scanned) {
@@ -101,7 +106,7 @@ export default new Vuex.Store({
                     });
             };
 
-            let addPlaylists = function (playlists:Playlist[]) {
+            let addPlaylists = function (playlists: Playlist[]) {
                 for (const playlist of playlists) {
                     if (_isSupermemoPlaylist(playlist)) {
                         addIfUnscanned(playlist);
@@ -113,10 +118,10 @@ export default new Vuex.Store({
                 .fetchPlaylists()
                 .then(playlists => addPlaylists(playlists));
         },
-        findNewSongs(context) {
+        async findNewSongs(context) {
             context.state.newSongs = [];
 
-            function handleNEwTrack(track:SpotifyTrack) {
+            function handleNEwTrack(track: SpotifyTrack) {
                 let existingTrack = context.state.newSongs.find((s) => s.id === track.id);
                 if (existingTrack) {
                     if (existingTrack.weight < track.weight)
@@ -126,7 +131,7 @@ export default new Vuex.Store({
                 }
             }
 
-            function investigateTracks(tracks:SpotifyTrack[]) {
+            function investigateTracks(tracks: SpotifyTrack[]) {
                 for (const track of tracks) {
                     scheduleService.isNew(track).then(b => {
                         if (b) {
@@ -136,16 +141,17 @@ export default new Vuex.Store({
                 }
             }
 
-            scheduleService.getTrackedPlaylists()
-                .then((playlists) => {
-                    for (const playlist of playlists) {
-                        spotifyDataService.getTracks(playlist)
-                            .then(tracks => {
-                                investigateTracks(tracks);
-                            });
-                    }
+            context.state.loading = true;
 
-                });
+            const playlists = await scheduleService.getTrackedPlaylists();
+            for (const playlist of playlists) {
+                context.state.loadingMessage = "Getting tracks of playlist " + playlist.name;
+
+                const tracks = await spotifyDataService.getTracks(playlist);
+                await investigateTracks(tracks);
+            }
+
+            context.state.loading = false;
         },
         scanPlaylist(context, playlist) {
             let markPlaylistScanned = function () {
@@ -153,7 +159,7 @@ export default new Vuex.Store({
                 return scheduleService.savePlaylist(playlist);
             }.bind(this);
 
-            let saveTracks = function (tracks:SpotifyTrack[]) {
+            let saveTracks = function (tracks: SpotifyTrack[]) {
                 return Promise.all(tracks.map(track => scheduleService.saveTrack(track)))
                     .then(() => markPlaylistScanned());
             };

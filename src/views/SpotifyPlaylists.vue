@@ -15,8 +15,12 @@
 
         <a href="#!" class="button button-primary" @click="findNewSongs">Find new songs</a>
         &nbsp;
-        <!--<a v-if="newSongs.length > 0" href.stop.prevent="#!" @click="createPlaylist" class="button button-primary">Create playlist</a>-->
         <a v-if="newSongs.length > 0" href.stop.prevent="#!" @click="addToBuffer" class="button button-primary">Add to buffer</a>
+
+        <div v-if="loading">
+            <spinner></spinner>
+            <p>{{loadingMessage}}</p>
+        </div>
 
         <ul>
             <li v-for="song in newSongs" :key="song.id">
@@ -37,15 +41,16 @@
     import SpotifyLogin from "./SpotifyLogin";
     import {mapState} from 'vuex';
     import store from "../store";
+    import Spinner from "./Spinner";
 
     export default {
         name: 'Home',
-        components: {SpotifyLogin, ToDoList},
+        components: {Spinner, SpotifyLogin, ToDoList},
         props: {
             msg: String
         },
         computed: {
-            ...mapState(["unscannedPlaylists", "newSongs"])
+            ...mapState(["unscannedPlaylists", "newSongs", "loading", "loadingMessage"])
         },
         methods: {
             /**
