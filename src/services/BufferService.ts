@@ -2,19 +2,21 @@ import firebase from "firebase";
 import SpotifyTrack from "../model/SpotifyTrack";
 
 class BufferService {
+    private _db: firebase.firestore.Firestore | undefined;
 
     constructor() {
-        this._db = null;
+
     }
 
 
     get db() {
-        if (this._db === null) {
+        if (this._db === undefined) {
             this._db = firebase.firestore();
             this._db.settings({
                 timestampsInSnapshots: true
             });
         }
+        // @ts-ignore
         return this._db.collection("users").doc(firebase.auth().currentUser.uid);
     }
 
@@ -22,7 +24,7 @@ class BufferService {
         return this.db.collection("buffer");
     }
 
-    addToBuffer(songs) {
+    addToBuffer(songs: SpotifyTrack[]) {
         const self = this;
         return Promise.all(songs.map(song => {
             return self.bufferTable
@@ -37,7 +39,7 @@ class BufferService {
         }));
     }
 
-    deleteFromBuffer(songs) {
+    deleteFromBuffer(songs:SpotifyTrack[]) {
         const self = this;
         songs.forEach((song) => {
             self.bufferTable
@@ -56,7 +58,7 @@ class BufferService {
             .orderBy("weight", "desc")
             .get()
             .then((docs) => {
-                let songs = [];
+                let songs:SpotifyTrack[] = [];
                 docs.forEach((doc) => {
                     let d = doc.data();
                     songs.push(new SpotifyTrack(

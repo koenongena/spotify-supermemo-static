@@ -1,9 +1,13 @@
 import firebase from 'firebase';
-import moment from "moment";
+import moment, {Moment} from "moment";
 import Study from "../model/Study";
 import SpotifyPlaylist from "../model/SpotifyPlaylist";
+import SpotifyTrack from "@/model/SpotifyTrack";
+import {Playlist} from "@/model/Playlist";
 
 class StudyScheduleService {
+    private _db: firebase.firestore.Firestore|null;
+    private _log: Console;
 
     constructor() {
         this._db = null;
@@ -16,18 +20,18 @@ class StudyScheduleService {
      * @param date {Date}
      * @returns {Promise<void | never>}
      */
-    create(date) {
+    create(date:Date) {
         let startOfTheDay = moment(date).startOf('day');
         let playlistName = startOfTheDay.format("YYYY-MM-DD");
 
-        let createStudy = function (iteration = 0, date, additionalDays = 0) {
+        let createStudy = function (iteration = 0, date:Moment, additionalDays = 0) {
             let timestamp = date.clone().add(additionalDays, 'days');
             let id = timestamp.format("YYYY-MM-DD") + "__" + playlistName;
             let done = false;
             return new Study(id, timestamp.toDate(), playlistName, iteration, done);
         };
 
-        let sm = [
+        let sm:Study[] = [
             createStudy(0, startOfTheDay),
             createStudy(1, startOfTheDay, 2),
             createStudy(2, startOfTheDay, 10),
@@ -56,22 +60,22 @@ class StudyScheduleService {
             .where("done", "==", false)
             .where("date", "<=", new Date())
             .get()
-            .then(docs => {
-                let studies = [];
-                docs.forEach((doc) => studies.push(doc.data()));
+            .then((docs:any) => {
+                let studies:Study[] = [];
+                docs.forEach((doc:any) => studies.push(Study.parse(doc.data())));
                 return studies;
             });
     }
 
     getDays() {
-        let groupByDate = function (studies) {
-            const days = studies.reduce(function (acc, s) {
+        let groupByDate = function (studies:Study[]) {
+            const days = studies.reduce(function (acc:any, s:any) {
                 const p = moment(s.date).format("YYYY-MM-DD");
                 if (!acc[0].hasOwnProperty(p)) acc[0][p] = [];
                 acc[0][p].push(s);
                 return acc;
             }, [{}])
-                .reduce(function (acc, v) {
+                .reduce(function (acc:any, v:any) {
                     Object.keys(v).forEach(function (k) {
                         acc.push({date: k, studyMoments: v[k]})
                     });
@@ -80,9 +84,10 @@ class StudyScheduleService {
 
             return days;
         };
+
         return this.studiesTable.where("date", ">=", moment().add(-30, 'days').toDate()).get().then((docs) => {
-            let studies = [];
-            docs.forEach((doc) => {
+            let studies:Study[] = [];
+            docs.forEach((doc:any) => {
                 studies.push(Study.parse(doc.data()));
             });
 
@@ -96,7 +101,7 @@ class StudyScheduleService {
      * @param study {Study}
      * @returns {Promise<void | never>}
      */
-    setDone(study) {
+    setDone(study:Study) {
         this._log.debug("Setting ", study.id + " to done");
 
         return this.studiesTable
@@ -104,7 +109,7 @@ class StudyScheduleService {
             .update({done: true});
     }
 
-    setPending(study) {
+    setPending(study:Study) {
         this._log.debug("Setting ", study.id + " to pending");
 
         return this.studiesTable
@@ -112,11 +117,11 @@ class StudyScheduleService {
             .update({done: false});
     }
 
-    deletePlaylist(playlistName) {
+    deletePlaylist(playlistName:string) {
         return this.studiesTable
             .where("playlist", "==", playlistName)
-            .get().then(docs => {
-                docs.forEach(doc => {
+            .get().then((docs:any) => {
+                docs.forEach((doc:any) => {
                     doc.ref.delete();
                 })
             });
@@ -145,13 +150,13 @@ class StudyScheduleService {
                 timestampsInSnapshots: true
             });
         }
-        return this._db.collection("users").doc(firebase.auth().currentUser.uid);
+        return this._db.collection("users").doc(firebase.auth().currentUser!!.uid);
     }
 
     fetchUnscannedPlaylists(){
         return this.playlistsTable.where("scanned", "==", false).get()
             .then((docs) => {
-                let playlists = [];
+                let playlists:SpotifyPlaylist[] = [];
                 docs.forEach((doc) => {
                     let documentData = doc.data();
                     playlists.push(new SpotifyPlaylist(documentData));
@@ -166,7 +171,7 @@ class StudyScheduleService {
      *
      * @param track {SpotifyTrack}
      */
-    saveTrack(track) {
+    saveTrack(track:SpotifyTrack) {
         return this.tracksTable.doc(track.id)
             .set({
                 id: track.id,
@@ -180,7 +185,7 @@ class StudyScheduleService {
      *
      * @param playlist {SpotifyPlaylist}
      */
-    savePlaylist(playlist) {
+    savePlaylist(playlist:SpotifyPlaylist) {
         return this.playlistsTable.doc(playlist.name)
             .set({
                 id: playlist.id,
@@ -193,7 +198,7 @@ class StudyScheduleService {
     getTracksInTrackedPlaylists(){
         return this.db.collection("scanlist").get()
             .then((docs) => {
-                let playlists = [];
+                let playlists:Playlist[] = [];
                 docs.forEach(() => {
 
                 });
@@ -205,7 +210,7 @@ class StudyScheduleService {
     getTrackedPlaylists(){
         return this.db.collection("scanlist").get()
             .then((docs) => {
-                let playlists = [];
+                let playlists:SpotifyPlaylist[] = [];
                 docs.forEach((doc) => {
                     playlists.push(new SpotifyPlaylist({id: doc.data().id, name: doc.data().name, weight: doc.data().weight}))
                 });
@@ -213,7 +218,7 @@ class StudyScheduleService {
             });
     }
 
-    isNew(track) {
+    isNew(track:SpotifyTrack) {
         const studiedTrack = this.tracksTable.where("id", "==", track.id).get();
         const bufferedTrack = this.bufferTable.where("id", "==", track.id).get();
 
@@ -221,12 +226,7 @@ class StudyScheduleService {
             .then((values) => values.every(docs => docs.size === 0));
     }
 
-    /**
-     *
-     * @param playlistName
-     * @returns {Promise}
-     */
-    getPlaylistsWithName(playlistName) {
+    getPlaylistsWithName(playlistName:string) {
         return this.playlistsTable
             .doc(playlistName)
             .get()
