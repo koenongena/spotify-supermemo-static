@@ -76,6 +76,33 @@ export default new Vuex.Store({
                 }
             }
         },
+        spotifyLogin(context) {
+            const CLIENT_ID = process.env.VUE_APP_SPOTIFY_CLIENT_ID;
+            const REDIRECT_URI = process.env.VUE_APP_SPOTIFY_REDIRECT_URL;
+
+            function getLoginURL(scopes: string[]) {
+                return 'https://accounts.spotify.com/authorize?client_id=' + CLIENT_ID +
+                    '&redirect_uri=' + encodeURIComponent(REDIRECT_URI) +
+                    '&scope=' + encodeURIComponent(scopes.join(' ')) +
+                    '&response_type=token';
+            }
+
+            const url = getLoginURL(['playlist-read-private', 'playlist-modify-private', 'playlist-modify-public']),
+                width = 450,
+                height = 730,
+                left = (screen.width / 2) - (width / 2),
+                top = (screen.height / 2) - (height / 2);
+
+
+            const spotifyLoginWindow = window.open(url,
+                'Spotify',
+                'menubar=no,location=no,resizable=no,scrollbars=no,status=no, width=' + width + ', height=' + height + ', top=' + top + ', left=' + left
+            );
+
+            spotifyLoginWindow!!.onbeforeunload = function () {
+                context.dispatch('registerSpotifyToken');
+            };
+        },
         registerSpotifyToken(context) {
             let accessToken = localStorage.getItem('sp-accessToken');
             //let expiration = localStorage.getItem('sp-accessTokenExpiresIn');

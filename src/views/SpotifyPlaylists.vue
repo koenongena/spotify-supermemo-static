@@ -2,8 +2,6 @@
     <div class="home">
         <h1>Playlists</h1>
 
-        <spotify-login></spotify-login>
-
         <a href="#!" @click="getUnscannedPlaylists" class="button">Find unscanned playlists</a>
 
         <ul>
@@ -38,14 +36,13 @@
     /* eslint-disable no-console */
 
     import ToDoList from "./ToDoList";
-    import SpotifyLogin from "./SpotifyLogin";
     import {mapState} from 'vuex';
     import store from "../store";
     import Spinner from "./Spinner";
 
     export default {
         name: 'Home',
-        components: {Spinner, SpotifyLogin, ToDoList},
+        components: {Spinner, ToDoList},
         props: {
             msg: String
         },

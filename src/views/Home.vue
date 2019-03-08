@@ -1,7 +1,5 @@
 <template>
     <div class="home">
-        <spotify-login/>
-
         <h1>TO DO</h1>
 
         <to-do-list :study-moments="studyMoments" />
@@ -14,13 +12,12 @@
 
 <script>
     import ToDoList from "./ToDoList";
-    import SpotifyLogin from "./SpotifyLogin";
     import {mapState} from 'vuex';
     import store from "../store";
 
     export default {
         name: 'Home',
-        components: {SpotifyLogin, ToDoList},
+        components: {ToDoList},
         props: {
             msg: String
         },

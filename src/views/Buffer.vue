@@ -1,9 +1,9 @@
 <template>
     <div>
-        <div>
-            <a href="#" @click="pop10" class="button button-primary">Pop 10</a>
-            &nbsp;
-            <a href="#" @click="pop5" class="button button-primary">Pop 5</a>
+        <div class="mdl-card__actions" v-if="$store.state.spotifyAccessToken">
+            <a href="#" @click="pop(20)" class="button button-primary">Pop 20</a>&nbsp;
+            <a href="#" @click="pop(10)" class="button button-primary">Pop 10</a>&nbsp;
+            <a href="#" @click="pop(5)" class="button button-primary">Pop 5</a>
         </div>
         <p v-if="loading">Loading...</p>
         <ul>
@@ -49,13 +49,10 @@
                             });
                     });
             },
-            pop10: function () {
-                this.addSongsToSPotify(10);
+            pop: function (count) {
+                this.addSongsToSPotify(count);
 
 
-            },
-            pop5: function () {
-                this.addSongsToSPotify(5);
             }
         }
 
