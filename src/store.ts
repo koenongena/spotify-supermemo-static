@@ -129,22 +129,23 @@ export default new Vuex.Store({
         async findNewSongs(context) {
             context.state.newSongs = [];
 
-            function handleNEwTrack(track: SpotifyTrack) {
-                let existingTrack = context.state.newSongs.find((s) => s.id === track.id);
-                if (existingTrack) {
-                    if (existingTrack.weight < track.weight)
-                        existingTrack.weight = track.weight;
-                } else {
-                    context.state.newSongs.push(track);
-                }
+            async function handleNewTrack(track: SpotifyTrack) {
+                scheduleService.getBuffered(track.id).then((bufferedTrack) => {
+                    if (bufferedTrack && bufferedTrack.weight < track.weight) {
+                        context.state.newSongs.push(track);
+                    } else if (!bufferedTrack) {
+                        context.state.newSongs.push(track);
+                    }
+                });
             }
 
             function investigateTracks(tracks: SpotifyTrack[]) {
                 for (const track of tracks) {
-                    scheduleService.isNew(track).then(b => {
-                        if (b) {
-                            handleNEwTrack(track);
+                    scheduleService.isStudied(track).then(newSong => {
+                        if (newSong) {
+                            handleNewTrack(track)
                         }
+
                     })
                 }
             }

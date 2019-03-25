@@ -218,12 +218,33 @@ class StudyScheduleService {
             });
     }
 
-    isNew(track:SpotifyTrack) {
-        const studiedTrack = this.tracksTable.where("id", "==", track.id).get();
-        const bufferedTrack = this.bufferTable.where("id", "==", track.id).get();
+    getBuffered(trackId: String) {
+        return this.bufferTable
+            .where("id", "==", trackId)
+            .get()
+            .then((docs) => {
+                if (docs.size > 0) {
+                    const d = docs.docs[0].data();
+                    return new SpotifyTrack(
+                        d.id,
+                        "-",
+                        d.artist,
+                        d.title,
+                        d.uri,
+                        d.weight
+                    )
+                }
 
-        return Promise.all([studiedTrack, bufferedTrack])
-            .then((values) => values.every(docs => docs.size === 0));
+                return undefined;
+            });
+    }
+
+    isStudied(track:SpotifyTrack) {
+        return this.tracksTable
+            .where("id", "==", track.id)
+            .get()
+            .then((docs) => docs.size === 0);
+
     }
 
     getPlaylistsWithName(playlistName:string) {
