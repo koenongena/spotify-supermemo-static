@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="mdl-card__actions" v-if="$store.state.spotifyAccessToken">
-            <a href="#" @click="pop(20)" class="button button-primary">Pop 20</a>&nbsp;
+            <a href="#" @click="pop(25)" class="button button-primary">Pop 25</a>&nbsp;
             <a href="#" @click="pop(10)" class="button button-primary">Pop 10</a>&nbsp;
             <a href="#" @click="pop(5)" class="button button-primary">Pop 5</a>
         </div>
