@@ -5,9 +5,14 @@
             <a href="#" @click="pop(10)" class="button button-primary">Pop 10</a>&nbsp;
             <a href="#" @click="pop(5)" class="button button-primary">Pop 5</a>
         </div>
-        <p v-if="loading">Loading...</p>
+
+        <div v-if="$store.state.loading">
+            <spinner></spinner>
+            <p>Loading...</p>
+        </div>
+
         <ul>
-            <li v-for="song in songs" v-bind:key="song.id">
+            <li v-for="song in $store.state.buffer" v-bind:key="song.id">
                 {{song.artist}} - {{song.title}} ({{song.weight}})
             </li>
         </ul>
@@ -17,41 +22,17 @@
 
 <script>
 
-    import {bufferService} from "../services/BufferService";
-    import {spotifyDataService} from "../services/SpotifyService";
+    import Spinner from "./Spinner";
 
     export default {
         name: "Buffer",
-        data: function () {
-            return {
-                songs: [],
-                loading: false
-            }
-        },
+        components: {Spinner},
         mounted: function () {
-            const self = this;
-            bufferService.getBuffer()
-                .then(it => self.songs = it)
+            this.$store.dispatch("loadBuffer");
         },
         methods: {
-            addSongsToSPotify: function (count) {
-                const songsToAdd = this.songs.slice(0, count);
-                let self = this;
-                self.loading = true;
-
-                spotifyDataService.createPlaylist("New playlist")
-                    .then((playlistId) => {
-                        spotifyDataService.addTracks(playlistId, songsToAdd)
-                            .then(() => {
-                                self.loading = false;
-                                self.songs = self.songs.slice(count);
-                                bufferService.deleteFromBuffer(songsToAdd);
-                            });
-                    });
-            },
             pop: function (count) {
-                this.addSongsToSPotify(count);
-
+                this.$store.dispatch("popFromBuffer", count);
 
             }
         }

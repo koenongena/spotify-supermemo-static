@@ -12,7 +12,9 @@ Vue.use(Vuex);
 
 const Mutations = {
     STUDYMOMENTS: 'STUDYMOMENTS',
-    SPOTIFY_ACCESS: 'SPOTIFY_ACCESS'
+    SPOTIFY_ACCESS: 'SPOTIFY_ACCESS',
+    BUFFER: 'BUFFER',
+    LOADING: "LOADING"
 };
 
 interface MyState {
@@ -21,7 +23,8 @@ interface MyState {
     unscannedPlaylists: SpotifyPlaylist[];
     newSongs: SpotifyTrack[];
     loading: boolean;
-    loadingMessage:string;
+    loadingMessage: string;
+    buffer: SpotifyTrack[];
 }
 
 const state: MyState = {
@@ -30,8 +33,8 @@ const state: MyState = {
     unscannedPlaylists: [],
     newSongs: [],
     loading: false,
-    loadingMessage: ""
-
+    loadingMessage: "",
+    buffer: []
 };
 
 export default new Vuex.Store({
@@ -44,6 +47,12 @@ export default new Vuex.Store({
         [Mutations.SPOTIFY_ACCESS](state, accessToken) {
             state.spotifyAccessToken = accessToken;
             spotifyDataService.updateToken(accessToken);
+        },
+        [Mutations.BUFFER](state, buffer) {
+            state.buffer = buffer;
+        },
+        [Mutations.LOADING](state, l) {
+            state.loading = l;
         }
     },
     actions: {
@@ -212,6 +221,33 @@ export default new Vuex.Store({
             bufferService.addToBuffer(context.state.newSongs)
                 .then(() => {
                     context.state.newSongs = [];
+                });
+        },
+        loadBuffer(context) {
+            context.commit(Mutations.LOADING, true);
+            context.commit(Mutations.BUFFER, []);
+
+            return bufferService.getBuffer()
+                .then(it => context.commit(Mutations.BUFFER, it))
+                .then(() => context.commit(Mutations.LOADING, false))
+        },
+        popFromBuffer(context, count) {
+            context.commit(Mutations.LOADING, true);
+
+            const songsToAdd = context.state.buffer.slice(0, count);
+            let songsToKeep = context.state.buffer.slice(count);
+
+            let playlist = moment().format("YYYY-MM-dd");
+
+            spotifyDataService.createPlaylist(playlist)
+                .then((playlistId) => {
+                    spotifyDataService.addTracks(playlistId, songsToAdd)
+                        .then(() => {
+
+                            context.commit(Mutations.LOADING, false);
+                            context.commit(Mutations.BUFFER, songsToKeep);
+                            bufferService.deleteFromBuffer(songsToAdd);
+                        });
                 });
         }
     }
