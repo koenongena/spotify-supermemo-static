@@ -11,6 +11,12 @@
 
         <h1>Tracked playlists</h1>
 
+        <a href="#" @click="showTrackedPlaylists">Show tracked playlists</a>
+
+        <ul>
+            <li v-for="playlist in trackedPlaylists" :key="playlist.id">{{playlist.name}} - weight {{playlist.weight}}</li>
+        </ul>
+
         <a href="#!" class="button button-primary" @click="findNewSongs">Find new songs</a>
         &nbsp;
         <a v-if="newSongs.length > 0" href.stop.prevent="#!" @click="addToBuffer" class="button button-primary">Add to buffer</a>
@@ -20,13 +26,13 @@
             <p>{{loadingMessage}}</p>
         </div>
 
-        <ul>
+        <ol>
             <li v-for="song in newSongs" :key="song.id">
                 <span class="mdl-list__item-primary-content">
-                 {{song.artist}} - {{song.title}} ({{song.id}}) (weight: {{song.weight}}
+                 {{song.artist}} - {{song.title}} (weight: {{song.weight}})
                 </span>
             </li>
-        </ul>
+        </ol>
 
 
     </div>
@@ -47,7 +53,7 @@
             msg: String
         },
         computed: {
-            ...mapState(["unscannedPlaylists", "newSongs", "loading", "loadingMessage"])
+            ...mapState(["unscannedPlaylists", "trackedPlaylists", "newSongs", "loading", "loadingMessage"])
         },
         methods: {
             /**
@@ -63,11 +69,14 @@
             findNewSongs() {
                 store.dispatch("findNewSongs");
             },
-            createPlaylist(){
+            createPlaylist() {
                 store.dispatch("createPlaylistFromNewSongs");
             },
-            addToBuffer(){
+            addToBuffer() {
                 store.dispatch("addToBuffer");
+            },
+            showTrackedPlaylists() {
+                this.$store.dispatch("loadTrackedPlaylists")
             }
         }
     }

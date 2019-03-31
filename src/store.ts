@@ -14,13 +14,15 @@ const Mutations = {
     STUDYMOMENTS: 'STUDYMOMENTS',
     SPOTIFY_ACCESS: 'SPOTIFY_ACCESS',
     BUFFER: 'BUFFER',
-    LOADING: "LOADING"
+    LOADING: "LOADING",
+    TRACKED_PLAYLISTS: "TRACKED_PLAYLISTS"
 };
 
 interface MyState {
     studyMoments: StudyMoment[];
     spotifyAccessToken: string | null;
     unscannedPlaylists: SpotifyPlaylist[];
+    trackedPlaylists: SpotifyPlaylist[];
     newSongs: SpotifyTrack[];
     loading: boolean;
     loadingMessage: string;
@@ -34,7 +36,9 @@ const state: MyState = {
     newSongs: [],
     loading: false,
     loadingMessage: "",
-    buffer: []
+    buffer: [],
+    trackedPlaylists: []
+
 };
 
 export default new Vuex.Store({
@@ -53,6 +57,9 @@ export default new Vuex.Store({
         },
         [Mutations.LOADING](state, l) {
             state.loading = l;
+        },
+        [Mutations.TRACKED_PLAYLISTS](state, playlists) {
+            state.trackedPlaylists = playlists;
         }
     },
     actions: {
@@ -193,7 +200,11 @@ export default new Vuex.Store({
                 context.state.loadingMessage = "Getting tracks of playlist " + playlist.name;
 
                 const tracks = await spotifyDataService.getTracks(playlist);
-                await investigateTracks(tracks);
+                if (playlist.restudy) {
+                    await tracks.forEach((track) => handleNewTrack(track));
+                } else {
+                    await investigateTracks(tracks);
+                }
             }
 
             context.state.loading = false;
@@ -230,6 +241,11 @@ export default new Vuex.Store({
             return bufferService.getBuffer()
                 .then(it => context.commit(Mutations.BUFFER, it))
                 .then(() => context.commit(Mutations.LOADING, false))
+        },
+        loadTrackedPlaylists(context) {
+            return scheduleService.getTrackedPlaylists().then(playlists => {
+                context.commit(Mutations.TRACKED_PLAYLISTS, playlists);
+            });
         },
         popFromBuffer(context, count) {
             context.commit(Mutations.LOADING, true);

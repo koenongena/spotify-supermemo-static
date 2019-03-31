@@ -51,14 +51,23 @@ class SpotifyService {
         let url = "https://api.spotify.com/v1/playlists/" + playlist.id + "/tracks ";
         return this._fetch(url, responses)
             .then(() => {
-                return responses.flatMap(response => response.data.items.map((json: any) => new SpotifyTrack(
-                    json.track.id,
-                    playlist.name,
-                    json.track.artists[0].name,
-                    json.track.name,
-                    json.track.uri,
-                    playlist.weight
-                )))
+                return responses.flatMap(response => response.data.items.map((json: any) => {
+                    let trackWeight = 0;
+                    if (playlist.weightedByPopularity) {
+                        trackWeight = json.track.popularity;
+                    } else {
+                        trackWeight = playlist.weight;
+                    }
+
+                    return new SpotifyTrack(
+                        json.track.id,
+                        playlist.name,
+                        json.track.artists[0].name,
+                        json.track.name,
+                        json.track.uri,
+                        trackWeight
+                    );
+                }));
             });
     }
 

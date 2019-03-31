@@ -207,12 +207,13 @@ class StudyScheduleService {
             });
     }
 
-    getTrackedPlaylists(){
+    getTrackedPlaylists(): Promise<SpotifyPlaylist[] | never> {
         return this.db.collection("scanlist").get()
             .then((docs) => {
                 let playlists:SpotifyPlaylist[] = [];
                 docs.forEach((doc) => {
-                    playlists.push(new SpotifyPlaylist({id: doc.data().id, name: doc.data().name, weight: doc.data().weight}))
+                    let json = doc.data();
+                    playlists.push(new SpotifyPlaylist(json))
                 });
                 return playlists;
             });
