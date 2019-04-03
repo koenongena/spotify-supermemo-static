@@ -11,11 +11,11 @@
             <p>Loading...</p>
         </div>
 
-        <ul>
+        <ol>
             <li v-for="song in $store.state.buffer" v-bind:key="song.id">
                 {{song.artist}} - {{song.title}} ({{song.weight}})
             </li>
-        </ul>
+        </ol>
 
     </div>
 </template>
