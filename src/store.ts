@@ -253,7 +253,7 @@ export default new Vuex.Store({
             const songsToAdd = context.state.buffer.slice(0, count);
             let songsToKeep = context.state.buffer.slice(count);
 
-            let playlist = moment().format("YYYY-MM-dd");
+            let playlist = moment().format("YYYY-MM-DD");
 
             spotifyDataService.createPlaylist(playlist)
                 .then((playlistId) => {
