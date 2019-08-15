@@ -1,6 +1,7 @@
 import axios, {AxiosResponse} from 'axios';
 import SpotifyPlaylist from "../model/SpotifyPlaylist";
 import SpotifyTrack from "../model/SpotifyTrack";
+import {CreateSpotifyPlaylistResponse} from "@/model/Playlist";
 
 class SpotifyService {
     private spotifyAccessToken?: string | null;
@@ -78,6 +79,16 @@ class SpotifyService {
         const self = this;
         return axios.post("https://api.spotify.com/v1/users/" + this.userId + "/playlists", {name: name}, {headers: self.headers})
             .then(response => response.data.id)
+    }
+
+    async createPlaylist2(name: string) {
+        if (this.userId === null) {
+            alert("No spotify user id");
+        }
+
+        const self = this;
+        let response = await axios.post("https://api.spotify.com/v1/users/" + this.userId + "/playlists", {name: name}, {headers: self.headers});
+        return {id: response.data.id, uri: response.data.uri} as CreateSpotifyPlaylistResponse;
     }
 
     /**

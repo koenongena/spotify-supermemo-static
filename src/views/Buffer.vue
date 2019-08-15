@@ -4,6 +4,10 @@
             <a href="#" @click="pop(25)" class="button button-primary">Pop 25</a>&nbsp;
             <a href="#" @click="pop(10)" class="button button-primary">Pop 10</a>&nbsp;
             <a href="#" @click="pop(5)" class="button button-primary">Pop 5</a>
+            &nbsp;
+            <a href="#" @click="random(25)" class="button button-primary">Random 25</a>&nbsp;
+            <a href="#" @click="random(10)" class="button button-primary">Random 10</a>&nbsp;
+            <a href="#" @click="random(5)" class="button button-primary">Random 5</a>&nbsp;
         </div>
 
         <div v-if="$store.state.loading">
@@ -33,7 +37,9 @@
         methods: {
             pop: function (count) {
                 this.$store.dispatch("popFromBuffer", count);
-
+            },
+            random: function (count) {
+                this.$store.dispatch("randomFromBuffer", count);
             }
         }
 

@@ -12,9 +12,6 @@ class BufferService {
     get db() {
         if (this._db === undefined) {
             this._db = firebase.firestore();
-            this._db.settings({
-                timestampsInSnapshots: true
-            });
         }
         // @ts-ignore
         return this._db.collection("users").doc(firebase.auth().currentUser.uid);

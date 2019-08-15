@@ -18,4 +18,9 @@ class StudyMoment {
     }
 }
 
+export type CreateSpotifyPlaylistResponse = {
+    id: string;
+    uri:string;
+}
+
 export {Playlist, StudyMoment}

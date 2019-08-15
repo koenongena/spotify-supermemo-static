@@ -4,9 +4,10 @@ import moment from 'moment';
 import {scheduleService} from "./services/StudyScheduleService";
 import {spotifyDataService} from "./services/SpotifyService";
 import {bufferService} from "./services/BufferService";
-import {Playlist, StudyMoment} from "@/model/Playlist";
+import {CreateSpotifyPlaylistResponse, Playlist, StudyMoment} from "@/model/Playlist";
 import SpotifyTrack from "@/model/SpotifyTrack";
 import SpotifyPlaylist from "@/model/SpotifyPlaylist";
+import {shuffle} from "@/utils/arrays";
 
 Vue.use(Vuex);
 
@@ -265,6 +266,44 @@ export default new Vuex.Store({
                             bufferService.deleteFromBuffer(songsToAdd);
                         });
                 });
+        },
+        async randomFromBuffer(context, count) {
+            await context.commit(Mutations.LOADING, true);
+
+            const buffer = shuffle(context.state.buffer);
+
+            const songsToAddToPlaylist = buffer.slice(0, count);
+            let songsToKeepInBuffer = buffer.slice(count);
+
+            let playlistName = moment().format("YYYY-MM-DD");
+
+            // eslint-disable-next-line no-console
+            console.log(`Adding songs ${JSON.stringify(songsToAddToPlaylist)} to playlist ${playlistName}`);
+
+            let spotifyPlaylist = await scheduleService.getPlaylistsWithName(playlistName);
+
+            if (!spotifyPlaylist.id) {
+                //create spotify playlist and add to table
+                let createResponse: CreateSpotifyPlaylistResponse = await spotifyDataService.createPlaylist2(playlistName);
+                spotifyPlaylist = new SpotifyPlaylist({
+                    id: createResponse.id,
+                    uri: createResponse.uri,
+                    name: playlistName,
+                    scanned: false
+                });
+                await scheduleService.savePlaylist(spotifyPlaylist);
+                // eslint-disable-next-line no-console
+                console.log(`Added spotify playlist with id ${JSON.stringify(createResponse)}`);
+            }
+
+
+            await spotifyDataService.addTracks(spotifyPlaylist.id, songsToAddToPlaylist);
+            await bufferService.deleteFromBuffer(songsToAddToPlaylist);
+
+            await context.commit(Mutations.BUFFER, songsToKeepInBuffer);
+            await context.commit(Mutations.LOADING, false);
         }
+
+
     }
 })

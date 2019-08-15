@@ -146,9 +146,6 @@ class StudyScheduleService {
     get db() {
         if (this._db === null) {
             this._db = firebase.firestore();
-            this._db.settings({
-                timestampsInSnapshots: true
-            });
         }
         return this._db.collection("users").doc(firebase.auth().currentUser!!.uid);
     }
@@ -248,7 +245,7 @@ class StudyScheduleService {
 
     }
 
-    getPlaylistsWithName(playlistName:string) {
+    async getPlaylistsWithName(playlistName:string) {
         return this.playlistsTable
             .doc(playlistName)
             .get()

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "dev": "vue-cli-service serve",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
@@ -10,8 +11,8 @@
   },
   "dependencies": {
     "axios": "^0.18.1",
-    "firebase": "^5.11.1",
-    "firebaseui": "^3.6.1",
+    "firebase": "^6.3.5",
+    "firebaseui": "^4.1.0",
     "moment": "^2.24.0",
     "npm": "^6.10.3",
     "vue": "^2.6.10",
@@ -34,7 +35,7 @@
     "node-sass": "^4.12.0",
     "sass-loader": "^7.2.0",
     "ts-jest": "^23.0.0",
-    "typescript": "~3.2.2",
+    "typescript": "~3.1.1",
     "vue-template-compiler": "^2.6.10"
   },
   "eslintConfig": {
