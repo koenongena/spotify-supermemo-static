@@ -210,18 +210,10 @@ export default new Vuex.Store({
 
             context.state.loading = false;
         },
-        scanPlaylist(context, playlist) {
-            let markPlaylistScanned = function () {
-                playlist.scanned = true;
-                return scheduleService.savePlaylist(playlist);
-            }.bind(this);
-
-            let saveTracks = function (tracks: SpotifyTrack[]) {
-                return Promise.all(tracks.map(track => scheduleService.saveTrack(track)))
-                    .then(() => markPlaylistScanned());
-            };
-            return spotifyDataService.getTracks(playlist)
-                .then(tracks => saveTracks(tracks));
+        async scanPlaylist(context, playlist: SpotifyPlaylist) {
+            await scanSpotifyPlaylist(playlist, (loading: boolean) => {
+                context.commit(Mutations.LOADING, loading);
+            });
         },
         createPlaylistFromNewSongs(context) {
             spotifyDataService.createPlaylist("New playlist")
@@ -266,9 +258,6 @@ const createFromBuffer = async (context: any, count: number, buffer: SpotifyTrac
 
     let playlistName = moment().format("YYYY-MM-DD");
 
-    // eslint-disable-next-line no-console
-    console.log(`Adding songs ${JSON.stringify(songsToAddToPlaylist)} to playlist ${playlistName}`);
-
     let spotifyPlaylist = await scheduleService.getPlaylistsWithName(playlistName);
 
     if (!spotifyPlaylist.id) {
@@ -281,8 +270,6 @@ const createFromBuffer = async (context: any, count: number, buffer: SpotifyTrac
             scanned: false
         });
         await scheduleService.savePlaylist(spotifyPlaylist);
-        // eslint-disable-next-line no-console
-        console.log(`Added spotify playlist with id ${JSON.stringify(createResponse)}`);
     }
 
 
@@ -291,5 +278,18 @@ const createFromBuffer = async (context: any, count: number, buffer: SpotifyTrac
 
     await context.commit(Mutations.BUFFER, songsToKeepInBuffer);
     await context.commit(Mutations.LOADING, false);
-}
+};
 
+export const scanSpotifyPlaylist = async (playlist: SpotifyPlaylist, toggleLoading: (b: boolean) => void) => {
+    toggleLoading(true);
+
+    const tracks = await spotifyDataService.getTracks(playlist);
+    // save tracks
+    await Promise.all(tracks.map(track => scheduleService.saveTrack(track)));
+    //set playlist to scanned
+    playlist.scanned = true;
+
+    await scheduleService.savePlaylist(playlist);
+
+    toggleLoading(false);
+};

@@ -2,7 +2,7 @@ export default class SpotifyPlaylist {
     readonly id: string;
     readonly name: string;
     readonly tracks: any[];
-    readonly scanned: boolean;
+    scanned: boolean;
     readonly uri: string;
     readonly weight: number;
     readonly restudy: boolean;

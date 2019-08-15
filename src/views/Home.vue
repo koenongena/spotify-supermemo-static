@@ -4,6 +4,11 @@
 
         <to-do-list :study-moments="studyMoments" />
 
+        <div v-if="$store.state.loading">
+            <p>Scanning tracks in playlist...</p>
+            <spinner/>
+        </div>
+
         <button @click.stop.prevent="addPlaylist">Add playlist for today</button>
 
         <p>{{ error }}</p>
@@ -14,10 +19,11 @@
     import ToDoList from "./ToDoList";
     import {mapState} from 'vuex';
     import store from "../store";
+    import Spinner from "@/views/Spinner";
 
     export default {
         name: 'Home',
-        components: {ToDoList},
+        components: {Spinner, ToDoList},
         props: {
             msg: String
         },

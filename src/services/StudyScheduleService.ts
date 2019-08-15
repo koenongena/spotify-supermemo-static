@@ -4,6 +4,7 @@ import Study from "../model/Study";
 import SpotifyPlaylist from "../model/SpotifyPlaylist";
 import SpotifyTrack from "@/model/SpotifyTrack";
 import {Playlist} from "@/model/Playlist";
+import {scanSpotifyPlaylist} from "@/store";
 
 class StudyScheduleService {
     private _db: firebase.firestore.Firestore|null;
@@ -101,12 +102,21 @@ class StudyScheduleService {
      * @param study {Study}
      * @returns {Promise<void | never>}
      */
-    setDone(study:Study) {
+    async setDone(study: Study) {
         this._log.debug("Setting ", study.id + " to done");
 
-        return this.studiesTable
+        await this.studiesTable
             .doc(study.id)
             .update({done: true});
+
+        const spotifyPlaylist: SpotifyPlaylist = await scheduleService.getPlaylistsWithName(study.playlist);
+
+        if (!spotifyPlaylist.scanned) {
+            await scanSpotifyPlaylist(spotifyPlaylist, (loading: boolean) => {
+                this._log.debug('Set to loading: ', loading);
+            });
+
+        }
     }
 
     setPending(study:Study) {
