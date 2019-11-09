@@ -2,9 +2,9 @@ import moment from 'moment';
 import {Playlist} from "@/model/Playlist";
 
 const addDays = function (date:Date, days:number) {
-    var date = new Date(date.valueOf());
-    date.setDate(date.getDate() + days);
-    return date;
+    var newDate = new Date(date.valueOf());
+    newDate.setDate(date.getDate() + days);
+    return newDate;
 };
 
 export default class Schedule {
