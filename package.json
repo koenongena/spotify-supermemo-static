@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "axios": "^0.18.1",
-    "firebase": "^6.3.5",
-    "firebaseui": "^4.1.0",
+    "firebase": "^7.3.0",
+    "firebaseui": "^4.2.0",
     "moment": "^2.24.0",
     "npm": "^6.10.3",
     "vue": "^2.6.10",

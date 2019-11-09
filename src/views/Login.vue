@@ -8,7 +8,8 @@
 
 <script>
     import firebase from 'firebase';
-    import firebaseui from 'firebaseui';
+
+    const firebaseui = require('firebaseui');
 
     export default {
         name: "Login"
