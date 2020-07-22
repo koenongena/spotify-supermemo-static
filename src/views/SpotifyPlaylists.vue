@@ -41,14 +41,13 @@
 <script>
     /* eslint-disable no-console */
 
-    import ToDoList from "./ToDoList";
     import {mapState} from 'vuex';
     import store from "../store";
     import Spinner from "./Spinner";
 
     export default {
         name: 'Home',
-        components: {Spinner, ToDoList},
+        components: {Spinner},
         props: {
             msg: String
         },

@@ -69,21 +69,19 @@ class StudyScheduleService {
     }
 
     getDays() {
-        let groupByDate = function (studies:Study[]) {
-            const days = studies.reduce(function (acc:any, s:any) {
+        const groupByDate = function (studies: Study[]) {
+            return studies.reduce(function (acc: any, s: any) {
                 const p = moment(s.date).format("YYYY-MM-DD");
-                if (!acc[0].hasOwnProperty(p)) acc[0][p] = [];
+                if (!acc[0][p]) acc[0][p] = [];
                 acc[0][p].push(s);
                 return acc;
             }, [{}])
-                .reduce(function (acc:any, v:any) {
+                .reduce(function (acc: any, v: any) {
                     Object.keys(v).forEach(function (k) {
                         acc.push({date: k, studyMoments: v[k]})
                     });
                     return acc;
                 }, []);
-
-            return days;
         };
 
         return this.studiesTable.where("date", ">=", moment().add(-30, 'days').toDate()).get().then((docs) => {

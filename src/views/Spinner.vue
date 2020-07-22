@@ -9,7 +9,7 @@
     export default {
         name: "Spinner",
         props: {
-            "message": ""
+            "message": {}
         }
     }
 </script>
