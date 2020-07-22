@@ -62,7 +62,9 @@ class StudyScheduleService {
             .where("date", "<=", new Date())
             .get()
             .then((docs: any) => {
-                return docs.map((doc: any) => Study.parse(doc.data()));
+                let studies:Study[] = [];
+                docs.forEach((doc:any) => studies.push(Study.parse(doc.data())));
+                return studies;
             });
     }
 
