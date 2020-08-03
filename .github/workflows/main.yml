@@ -17,6 +17,9 @@ jobs:
         node-version: 12.x
     - run: npm install
     - run: npm run build:prod
+      env:
+        VUE_APP_SPOTIFY_CLIENT_ID: ${{ secrets.VUE_APP_SPOTIFY_CLIENT_ID }}
+        VUE_APP_SPOTIFY_REDIRECT_URL: ${{ secrets.VUE_APP_SPOTIFY_REDIRECT_URL }}
 
     - name: Deploy to Firebase
       uses: lowply/deploy-firebase@v0.0.3
