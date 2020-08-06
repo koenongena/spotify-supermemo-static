@@ -6,7 +6,6 @@
         <aside>
             <router-link to="/home">Home</router-link>
             <router-link to="/schedule">Schedule</router-link>
-            <router-link to="/import">Import</router-link>
             <router-link to="/spotify-playlists">Spotify playlists</router-link>
             <router-link to="/buffer">Buffer</router-link>
 

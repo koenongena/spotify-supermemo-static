@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home.vue'
-import Import from './views/Import.vue'
 import Login from './views/Login.vue';
 import Buffer from './views/Buffer.vue';
 import Schedule from './views/Schedule.vue';
@@ -32,13 +31,6 @@ let router = new Router({
             path: '/schedule',
             name: 'schedule',
             component: Schedule,
-            meta: {
-                requiresAuth: true
-            }
-        },{
-            path: '/import',
-            name: 'import',
-            component: Import,
             meta: {
                 requiresAuth: true
             }

@@ -19,9 +19,10 @@ class StudyScheduleService {
     /**
      *
      * @param date {Date}
+     * @param spotifyPlaylistId {string | undefined}
      * @returns {Promise<void | never>}
      */
-    create(date: Date) {
+    create(date: Date, spotifyPlaylistId?: string) {
         let startOfTheDay = moment(date).startOf('day');
         let playlistName = startOfTheDay.format("YYYY-MM-DD");
 
@@ -29,7 +30,7 @@ class StudyScheduleService {
             let timestamp = date.clone().add(additionalDays, 'days');
             let id = timestamp.format("YYYY-MM-DD") + "__" + playlistName;
             let done = false;
-            return new Study(id, timestamp.toDate(), playlistName, iteration, done);
+            return new Study(id, timestamp.toDate(), playlistName, spotifyPlaylistId, iteration, done);
         };
 
         let sm: Study[] = [
@@ -51,7 +52,8 @@ class StudyScheduleService {
                     date: studyMoment.date,
                     iteration: studyMoment.iteration,
                     playlist: studyMoment.playlist,
-                    done: studyMoment.done
+                    done: studyMoment.done,
+                    spotifyPlaylistId: studyMoment.spotifyPlaylistId
                 })
         })).then(() => playlistName);
     }

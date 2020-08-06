@@ -77,8 +77,8 @@ export default new Vuex.Store({
             });
         },
 
-        addPlaylist() {
-            scheduleService.create(new Date())
+        addPlaylist(context, spotifyPlaylistId?: string) {
+            scheduleService.create(new Date(), spotifyPlaylistId)
                 .then((playlistName) => alert("Playlist " + playlistName + " added successfully"))
         },
         loadSpotifyAccessToken(context) {
@@ -270,6 +270,8 @@ const createFromBuffer = async (context: any, count: number, buffer: SpotifyTrac
             scanned: false
         });
         await scheduleService.savePlaylist(spotifyPlaylist);
+
+        await scheduleService.create(new Date(), spotifyPlaylist.id);
     }
 
 
