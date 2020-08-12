@@ -29,8 +29,8 @@ func main() {
 		}
 		back := "\"" + record[4] + " - " + record[2]  + "<br/>"+ "<iframe allow=\"\"encrypted-media\" allowtransparency=\"true\" frameborder=\"0\" height=\"380\" src=\"https://open.spotify.com/embed/track/" + record[0] + "\"\" width=\"\"300\"\"></iframe>" + "\""
 		
-		front := record[2]
-		tags := record[9]
+		front := "\"" + record[2] + "\""
+		tags := "\"" + record[10] + "\""
 
 		fmt.Printf("%s,%s,%s\n", front, back, tags)
 	}
