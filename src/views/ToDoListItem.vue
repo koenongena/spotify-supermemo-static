@@ -22,6 +22,8 @@
 
 <script>
 import {scheduleService} from '../services/StudyScheduleService';
+import {exportPlaylist} from "@/views/exportPlaylist";
+import {files} from "@/utils/files";
 
 export default {
   name: "ToDoListItem",
@@ -35,7 +37,18 @@ export default {
   },
   methods: {
     exportAnkiCsv() {
-      alert("Exporting...");
+
+      const access_token = this.$store.state.spotifyAccessToken;
+
+      if (access_token) {
+        let playlistId = this.studymoment.spotifyPlaylistId;
+        exportPlaylist(playlistId, access_token).then(csv => {
+          const blob = new Blob(["\uFEFF" + csv], {type: "text/csv;charset=utf-8"});
+          files.saveAs(blob, this.studymoment.spotifyPlaylistId + ".csv");
+        })
+      } else {
+        alert("Connect to spotify first, please");
+      }
     },
     setDone() {
       const self = this;
