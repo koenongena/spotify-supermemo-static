@@ -44,7 +44,7 @@ export default {
         let playlistId = this.studymoment.spotifyPlaylistId;
         exportPlaylist(playlistId, access_token).then(csv => {
           const blob = new Blob(["\uFEFF" + csv], {type: "text/csv;charset=utf-8"});
-          files.saveAs(blob, this.studymoment.spotifyPlaylistId + ".csv");
+          files.saveAs(blob, this.studymoment.playlist + ".csv");
         })
       } else {
         alert("Connect to spotify first, please");
