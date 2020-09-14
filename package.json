@@ -11,7 +11,7 @@
     "dev": "vue-cli-service serve"
   },
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.20.0",
     "core-js": "^3.6.5",
     "firebase": "^7.19.0",
     "firebaseui": "^4.6.1",
