@@ -34,7 +34,7 @@ class SpotifyService {
 
     _fetch(url: string, responses: AxiosResponse[]) {
         const self = this;
-        return new Promise((resolve) => {
+        return new Promise<void>((resolve) => {
             axios.get(url, {headers: self.headers})
                 .then(response => {
                     responses.push(response);
@@ -100,7 +100,7 @@ class SpotifyService {
     addTracks(playlistId: string, songs: SpotifyTrack[]): Promise<any> {
         const self = this;
         if (songs.length === 0) {
-            return new Promise((resolve) => resolve());
+            return new Promise<void>((resolve) => resolve());
         } else if (songs.length > 100) {
             return Promise.all([
                 this.addTracks(playlistId, songs.slice(0, 100)),
