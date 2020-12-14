@@ -23,9 +23,6 @@
     </div>
 </template>
 
-<style lang="scss">
-    @import "./styles/style.scss";
-</style>
 <script>
     export default {
         mounted: function () {
