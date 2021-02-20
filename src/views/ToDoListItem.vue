@@ -8,6 +8,7 @@
     <div v-if="loading">...</div>
     <a v-else href="#!" @click.stop.prevent="setDone()"><i class="material-icons">done</i></a>
 
+    <router-link :to="'/playlists/' + studymoment.playlist + '/details'" >Details</router-link>
     <a v-if="studymoment.spotifyPlaylistId" href="#" @click.stop.prevent="exportAnkiCsv()">Export Anki csv</a>
   </div>
 </template>
@@ -15,7 +16,7 @@
 <style>
 .todo-item {
   display: grid;
-  grid-template-columns: 10rem 10rem 15rem;
+  grid-template-columns: 10rem 10rem 15rem 15rem;
 
 }
 </style>

@@ -64,10 +64,28 @@ class StudyScheduleService {
             .where("date", "<=", new Date())
             .get()
             .then((docs: any) => {
-                let studies:Study[] = [];
-                docs.forEach((doc:any) => studies.push(Study.parse(doc.data())));
+                let studies: Study[] = [];
+                docs.forEach((doc: any) => studies.push(Study.parse(doc.data())));
                 return studies;
             });
+    }
+
+    getStudiesForPlaylist(playlistName: string) {
+        return this.studiesTable
+            .where("playlist", "==", playlistName)
+            .get()
+            .then((docs: any) => {
+                let studies: Study[] = [];
+                docs.forEach((doc: any) => studies.push(Study.parse(doc.data())));
+                return studies;
+            });
+    }
+
+    async updateStudiesSpotifyPlaylist(playlistName: string, spotifyPlaylistId: string) {
+        const studies = await this.studiesTable
+            .where("playlist", "==", playlistName)
+            .get();
+        await Promise.all(studies.docs.map((doc) => doc.ref.update({'spotifyPlaylistId': spotifyPlaylistId})));
     }
 
     getDays() {

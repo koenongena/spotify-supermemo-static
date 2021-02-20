@@ -6,6 +6,7 @@ import Buffer from './views/Buffer.vue';
 import Schedule from './views/Schedule.vue';
 import SpotifyCallback from './views/SpotifyCallback.vue';
 import SpotifyPlaylists from './views/SpotifyPlaylists.vue';
+import PlaylistDetails from './views/PlaylistDetails.vue';
 import firebase from 'firebase';
 
 Vue.use(Router);
@@ -62,6 +63,12 @@ let router = new Router({
             path: '/buffer',
             name: 'buffer',
             component: Buffer
+        },
+        {
+            path: '/playlists/:name/details',
+            name: 'playlistDetails',
+            component: PlaylistDetails,
+            props: true
         }
     ]
 });

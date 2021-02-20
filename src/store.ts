@@ -8,11 +8,14 @@ import {CreateSpotifyPlaylistResponse, StudyMoment} from "@/model/Playlist";
 import SpotifyTrack from "@/model/SpotifyTrack";
 import SpotifyPlaylist from "@/model/SpotifyPlaylist";
 import {shuffle} from "@/utils/arrays";
+import Study from "@/model/Study";
+import * as R from "ramda";
 
 Vue.use(Vuex);
 
 const Mutations = {
     STUDYMOMENTS: 'STUDYMOMENTS',
+    PLAYLIST_DETAILS: 'PLAYLIST_DETAILS',
     SPOTIFY_ACCESS: 'SPOTIFY_ACCESS',
     BUFFER: 'BUFFER',
     LOADING: "LOADING",
@@ -28,6 +31,7 @@ interface MyState {
     loading: boolean;
     loadingMessage: string;
     buffer: SpotifyTrack[];
+    playlistDetails: { studies: Study[] }
 }
 
 const state: MyState = {
@@ -38,7 +42,8 @@ const state: MyState = {
     loading: false,
     loadingMessage: "",
     buffer: [],
-    trackedPlaylists: []
+    trackedPlaylists: [],
+    playlistDetails: {studies: []}
 
 };
 
@@ -61,6 +66,9 @@ export default new Vuex.Store({
         },
         [Mutations.TRACKED_PLAYLISTS](state, playlists) {
             state.trackedPlaylists = playlists;
+        },
+        [Mutations.PLAYLIST_DETAILS](state, details) {
+            state.playlistDetails = details;
         }
     },
     actions: {
@@ -75,6 +83,30 @@ export default new Vuex.Store({
                 let studyMoments = context.state.studyMoments.filter((sm: any) => sm.id !== study.id);
                 context.commit(Mutations.STUDYMOMENTS, studyMoments);
             });
+        },
+
+        async getPlaylistDetails(context, name) {
+            console.log("Getting studies for playlist " + name);
+            const studies = await scheduleService.getStudiesForPlaylist(name);
+            console.log("Result = " + JSON.stringify(studies));
+
+            const extractSpotifyPlaylistId = R.pipe(
+                R.map(R.propOr("", "spotifyPlaylistId")),
+                R.filter(R.complement(R.isEmpty)),
+                R.head
+            );
+            context.commit(Mutations.PLAYLIST_DETAILS, {
+                studies,
+                spotifyPlaylistId: extractSpotifyPlaylistId(studies)
+            })
+        },
+
+        updateSpotifyPlaylistId(ctx, {playlistName, spotifyPlaylistId}) {
+            const cleanSpotifyId = R.pipe(R.replace('spotify:playlist:', ''), R.trim);
+            if (R.isEmpty(cleanSpotifyId(spotifyPlaylistId))) {
+                return;
+            }
+            scheduleService.updateStudiesSpotifyPlaylist(playlistName, cleanSpotifyId(spotifyPlaylistId));
         },
 
         addPlaylist(context, spotifyPlaylistId?: string) {
