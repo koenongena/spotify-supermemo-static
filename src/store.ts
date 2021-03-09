@@ -282,9 +282,12 @@ export default new Vuex.Store({
     }
 })
 
-const createFromBuffer = async (context: any, count: number, buffer: SpotifyTrack[]) => {
+const shuffleSameWeights = R.pipe(shuffle, R.sort(R.descend(R.prop("weight"))));
+
+const createFromBuffer = async (context: any, count: number, tracks: SpotifyTrack[]) => {
     await context.commit(Mutations.LOADING, true);
 
+    const buffer = shuffleSameWeights(tracks);
     const songsToAddToPlaylist = buffer.slice(0, count);
     let songsToKeepInBuffer = buffer.slice(count);
 
