@@ -3,6 +3,7 @@ import App from './App.vue'
 import firebase from 'firebase'
 import router from './router'
 import store from './store'
+import moment from "moment";
 
 Vue.config.productionTip = false;
 
@@ -28,5 +29,11 @@ firebase.auth().onAuthStateChanged(() => {
         app.$mount('#app')
     }
 
+});
+
+Vue.filter('formatDate', function(value: any) {
+    if (value) {
+        return moment(String(value)).format('DD MMM YYYY')
+    }
 });
 

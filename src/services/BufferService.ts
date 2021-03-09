@@ -52,7 +52,6 @@ class BufferService {
 
     getBuffer() {
         return this.bufferTable
-            .orderBy("weight", "desc")
             .get()
             .then((docs) => {
                 let songs:SpotifyTrack[] = [];
@@ -64,11 +63,11 @@ class BufferService {
                         d.artist,
                         d.title,
                         d.uri,
-                        d.weight
+                        parseInt(d.weight, 10)
                     ));
                 });
 
-                return songs;
+                return songs.sort((a, b) => b.weight - a.weight);
             });
     }
 }

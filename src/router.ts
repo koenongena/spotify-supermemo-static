@@ -1,12 +1,12 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home.vue'
-import Import from './views/Import.vue'
 import Login from './views/Login.vue';
 import Buffer from './views/Buffer.vue';
 import Schedule from './views/Schedule.vue';
 import SpotifyCallback from './views/SpotifyCallback.vue';
 import SpotifyPlaylists from './views/SpotifyPlaylists.vue';
+import PlaylistDetails from './views/PlaylistDetails.vue';
 import firebase from 'firebase';
 
 Vue.use(Router);
@@ -32,13 +32,6 @@ let router = new Router({
             path: '/schedule',
             name: 'schedule',
             component: Schedule,
-            meta: {
-                requiresAuth: true
-            }
-        },{
-            path: '/import',
-            name: 'import',
-            component: Import,
             meta: {
                 requiresAuth: true
             }
@@ -70,6 +63,12 @@ let router = new Router({
             path: '/buffer',
             name: 'buffer',
             component: Buffer
+        },
+        {
+            path: '/playlists/:name/details',
+            name: 'playlistDetails',
+            component: PlaylistDetails,
+            props: true
         }
     ]
 });
