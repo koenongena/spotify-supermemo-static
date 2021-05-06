@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
-    "core-js": "^3.6.5",
+    "core-js": "^3.11.3",
     "firebase": "^8.2.6",
     "firebaseui": "^4.7.1",
     "moment": "^2.29.1",
