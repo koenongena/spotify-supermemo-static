@@ -1,39 +1,28 @@
 # spotify-supermemo
 
-## Project setup
-```
-npm install
-```
+Applying the supermemo method to study songs. The songs are extracted from a list of spotify playlist. The application list the song in a so-called buffer. The buffer is used to create other spotify playlist (named by date - yyyy-MM-dd, eg 2020-09-21), which are used for studying.
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+## Getting started
 
-### Compiles and minifies for production
-```
-npm run build
-```
+    nvm use
+    npm install
+    npm run serve
 
-### Run your tests
-```
-npm run test
-```
+## Deploying
 
-### Lints and fixes files
-```
-npm run lint
-```
+Deployment is done by github actions. See the .github folder for details.
 
-### Deploying
-
-See https://cli.vuejs.org/guide/deployment.html#firebase
-
-#### Firebase
+### Manually deploying to  Firebase
 
     npm install -g firebase-tools
     npm run build
     firebase deploy --only hosting
-    
+
+
+## Run your tests
+```
+npm run test
+```
+
 
  
