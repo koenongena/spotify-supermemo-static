@@ -19,7 +19,7 @@ class SpotifyService {
             })
     }
 
-    async fetchPlaylists(url: string = "https://api.spotify.com/v1/me/playlists"):Promise<SpotifyPlaylist[]> {
+    async fetchPlaylists(url: string = "https://api.spotify.com/v1/me/playlists"): Promise<SpotifyPlaylist[]> {
         const self = this;
         let firstPlaylistts = await axios.get(url, {headers: self.headers});
         let playlists = firstPlaylistts.data.items.map((it: any) => new SpotifyPlaylist(it));
@@ -49,7 +49,7 @@ class SpotifyService {
 
     getTracks(playlist: SpotifyPlaylist) {
         let responses: AxiosResponse[] = [];
-        let url = "https://api.spotify.com/v1/playlists/" + playlist.id + "/tracks ";
+        let url = "https://api.spotify.com/v1/playlists/" + playlist.id + "/tracks";
         return this._fetch(url, responses)
             .then(() => {
                 return responses.flatMap(response => response.data.items.map((json: any) => {
@@ -118,7 +118,42 @@ class SpotifyService {
             'Authorization': "Bearer " + accessToken
         };
     }
+
+    updateUserId(id: string) {
+        this.userId = id;
+    }
 }
+
+export const getTracksFromPlaylist = (fetch: (url: string) => Promise<any>) => {
+
+    const _recursiveGetAllTracksFromUrl: (url: string) => Promise<any> = async (url) => {
+        const response = await fetch(url);
+
+        if (response.data.next) {
+            const nextTracks = await _recursiveGetAllTracksFromUrl(response.data.next);
+            return [...response.data.items, ...nextTracks];
+        }
+        return response.data.items;
+    };
+
+    return async (playlist: SpotifyPlaylist) => {
+        const getTrackWeight = playlist.weightedByPopularity ? (track: any) => track.popularity : () => playlist.weight;
+
+        const tracks = await _recursiveGetAllTracksFromUrl("https://api.spotify.com/v1/playlists/" + playlist.id + "/tracks ");
+
+        return tracks.map((json: any) => {
+            return new SpotifyTrack(
+                json.track.id,
+                playlist.name,
+                json.track.artists[0].name,
+                json.track.name,
+                json.track.uri,
+                getTrackWeight(json.track)
+            );
+        });
+    };
+};
+
 
 let spotifyDataService = new SpotifyService();
 export {spotifyDataService};

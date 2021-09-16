@@ -254,6 +254,7 @@ export default new Vuex.Store({
                 });
         },
         addToBuffer(context) {
+
             bufferService.addToBuffer(context.state.newSongs)
                 .then(() => {
                     context.state.newSongs = [];
