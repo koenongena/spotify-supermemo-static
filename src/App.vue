@@ -8,6 +8,7 @@
             <router-link to="/schedule">Schedule</router-link>
             <router-link to="/spotify-playlists">Spotify playlists</router-link>
             <router-link to="/buffer">Buffer</router-link>
+            <router-link to="/anki">Anki</router-link>
 
             <div id="status-bar">
                 <img v-if="$store.state.spotifyAccessToken" src="./assets/spotify_green.png" width="32" height="32" title="You are logged in with spotify"/>
