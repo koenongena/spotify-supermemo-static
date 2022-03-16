@@ -15,7 +15,7 @@
 <script>
 
     import Spinner from "./Spinner";
-    import {exportPlaylist, exportPreviewAnkiFile} from "@/views/exportPlaylist";
+    import { exportPreviewAnkiFile} from "@/views/exportPlaylist";
     import {files} from "@/utils/files";
 
     export default {
