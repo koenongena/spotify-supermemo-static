@@ -155,5 +155,11 @@ export const getTracksFromPlaylist = (fetch: (url: string) => Promise<any>) => {
 };
 
 
-let spotifyDataService = new SpotifyService();
-export {spotifyDataService};
+export const spotifyDataService = new SpotifyService();
+
+export const extractSpotifyPlaylistID = (url: string) => {
+    if (url.startsWith("http")) {
+        return new URL(url).pathname.split('/').slice(-1)[0];
+    }
+    return url;
+}

@@ -15,11 +15,11 @@ export const exportPlaylist = async (playlistId: string, access_token: string) =
     }).join("\n");
 };
 
-function renderFrontPreview(v: FlatArray<PlaylistInformation[], 1>) {
+function renderFrontPreview(v: PlaylistInformation) {
     if (v.previewUrl) {
         return escapeForCsvColumn(`<audio controls autoplay ><source type="audio/mpeg" src="${v.previewUrl}"></audio>`);
     } else {
-        return escapeForCsvColumn(`<iframe allow="encrypted-media" allowtransparency="true" frameborder="0" height="380" src="https://open.spotify.com/embed/track/${v.id}" width="300"></iframe>`);
+        return escapeForCsvColumn(v.title);
     }
 }
 
