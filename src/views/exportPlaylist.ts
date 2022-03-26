@@ -42,7 +42,7 @@ type PlaylistInformation = {
 }
 
 export const getPlaylistInformation: (playlisId: string, access_token: string) => Promise<PlaylistInformation[]> = async (playlistId: string, access_token: string) => {
-    const playlist = await utils.apiCall("https://api.spotify.com/v1/playlists/" + playlistId, access_token);
+    const playlist = await utils.apiCall(`https://api.spotify.com/v1/playlists/${playlistId}?market=BE`, access_token);
 
     // Make asynchronous API calls for 100 songs at a time, and put the results (all Promises) in a list.
     let requests = [];
