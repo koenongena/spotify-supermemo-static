@@ -25,7 +25,7 @@ jobs:
         VUE_APP_SPOTIFY_REDIRECT_URL: ${{ secrets.VUE_APP_SPOTIFY_REDIRECT_URL }}
 
     - name: Deploy to Firebase
-      uses: lowply/deploy-firebase@v0.0.3
+      uses: lowply/deploy-firebase@v0.0.5
       env:
         ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"  
         FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
