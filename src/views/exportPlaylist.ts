@@ -47,7 +47,7 @@ export const getPlaylistInformation: (playlisId: string, access_token: string) =
     // Make asynchronous API calls for 100 songs at a time, and put the results (all Promises) in a list.
     let requests = [];
     for (let offset = 0; offset < playlist.tracks.total; offset = offset + 100) {
-        requests.push(utils.apiCall(playlist.tracks.href.split('?')[0] + '?offset=' + offset + '&limit=100',
+        requests.push(utils.apiCall(`https://api.spotify.com/v1/playlists/${playlistId}?market=BE&offset=${offset}&limit=100`,
             access_token, offset));
     }
     return Promise.all(requests).then(responses => { // Gather all the data from the responses in a table.
